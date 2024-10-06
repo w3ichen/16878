@@ -33,12 +33,12 @@ void toggle_LED1( void )
 *************************************/
 void set_LED1_to_C6( void )
 {
-    static int prev_C6_val = 0;
+    static int prev_C6_val = -1;
     int C6_val = checkGPIOC6();
-
+    printf("C6_val=%d\n", C6_val);
     if (prev_C6_val != C6_val){
         // Value has changed, need to set it!
-        if (C6_val){
+        if (C6_val > 0){
             // Is HIGH, then turn LED1 on!
             setGPIOB0();
         }else{
@@ -48,3 +48,4 @@ void set_LED1_to_C6( void )
         prev_C6_val = C6_val;
     }
 }
+

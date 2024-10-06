@@ -215,8 +215,9 @@ void initGpioC6AsInput( void )
     *reg_pointer = *reg_pointer | GPIO_6_OSPEEDR_HIGH_SPEED; // Set to high speed
     /*Configure pulled-down*/
     reg_pointer = (uint32_t *) PORTC_PUPDR_REGISTER;
-    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_PUPDR));
-    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PD;
+    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_PUPDR)); // Clear bit
+    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PD; // Set C6 input to LOW
+    // *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PU; // Set C6 input to HIGH
 }
 
 void initGpioB0AsOutput( void )
