@@ -20,36 +20,36 @@
 
 /* MACRO definitions----------------------------------------------------------*/
 //Port B addresses:
-#define PORTB_BASE_ADDRESS ((uint32_t)0x40020400)        //The first address in memory corresponding to Port B (this is in the user manual!)
+#define PORTB_BASE_ADDRESS          ((uint32_t)0x40020400)        //The first address in memory corresponding to Port B (this is in the user manual!)
 // I gave you the first one, now you fill in the rest, check in the user manual what is the offset from the base address for each register!
-#define PORTB_MODER_REGISTER (PORTB_BASE_ADDRESS + 0x00) //replace the question mark with the correct offset!
-#define PORTB_OTYPER_REGISTER (PORTB_BASE_ADDRESS + 0x04)
-#define PORTB_OSPEEDR_REGISTER (PORTB_BASE_ADDRESS + 0x08)
-#define PORTB_PUPDR_REGISTER (PORTB_BASE_ADDRESS + 0x0C)
-#define PORTB_IDR_REGISTER (PORTB_BASE_ADDRESS + 0x10)
-#define PORTB_ODR_REGISTER (PORTB_BASE_ADDRESS + 0x14)
-#define PORTB_BSRRL_REGISTER (PORTB_BASE_ADDRESS + 0x18)
-#define PORTB_BSRR_REGISTER (PORTB_BASE_ADDRESS + 0x18)
-#define PORTB_BSRRH_REGISTER (PORTB_BASE_ADDRESS + 0x1A)
-#define PORTB_LCKR_REGISTER (PORTB_BASE_ADDRESS + 0x1C)
-#define PORTB_AFR1_REGISTER (PORTB_BASE_ADDRESS + 0x20)
-#define PORTB_AFR2_REGISTER (PORTB_BASE_ADDRESS + 0x24)
-#define PORTB_OSPEEDR_REGISTER (PORTB_BASE_ADDRESS + 0x08)
+#define PORTB_MODER_REGISTER        (PORTB_BASE_ADDRESS + 0x00) //replace the question mark with the correct offset!
+#define PORTB_OTYPER_REGISTER       (PORTB_BASE_ADDRESS + 0x04)
+#define PORTB_OSPEEDR_REGISTER      (PORTB_BASE_ADDRESS + 0x08)
+#define PORTB_PUPDR_REGISTER        (PORTB_BASE_ADDRESS + 0x0C)
+#define PORTB_IDR_REGISTER          (PORTB_BASE_ADDRESS + 0x10)
+#define PORTB_ODR_REGISTER          (PORTB_BASE_ADDRESS + 0x14)
+#define PORTB_BSRRL_REGISTER        (PORTB_BASE_ADDRESS + 0x18)
+#define PORTB_BSRR_REGISTER         (PORTB_BASE_ADDRESS + 0x18)
+#define PORTB_BSRRH_REGISTER        (PORTB_BASE_ADDRESS + 0x1A)
+#define PORTB_LCKR_REGISTER         (PORTB_BASE_ADDRESS + 0x1C)
+#define PORTB_AFR1_REGISTER         (PORTB_BASE_ADDRESS + 0x20)
+#define PORTB_AFR2_REGISTER         (PORTB_BASE_ADDRESS + 0x24)
+#define PORTB_OSPEEDR_REGISTER      (PORTB_BASE_ADDRESS + 0x08)
 
 //Port C addresses:
-#define PORTC_BASE_ADDRESS ((uint32_t)0x40020800) 
-#define PORTC_MODER_REGISTER (PORTC_BASE_ADDRESS + 0x00)
-#define PORTC_OTYPER_REGISTER (PORTC_BASE_ADDRESS + 0x04)
-#define PORTC_OSPEEDR_REGISTER (PORTC_BASE_ADDRESS + 0x08)
-#define PORTC_PUPDR_REGISTER (PORTC_BASE_ADDRESS + 0x0C)
-#define PORTC_IDR_REGISTER (PORTC_BASE_ADDRESS + 0x10)
-#define PORTC_ODR_REGISTER (PORTC_BASE_ADDRESS + 0x14)
-#define PORTC_BSRRL_REGISTER (PORTC_BASE_ADDRESS + 0x18)
-#define PORTC_BSRR_REGISTER (PORTC_BASE_ADDRESS + 0x18)
-#define PORTC_BSRRH_REGISTER (PORTC_BASE_ADDRESS + 0x1A)
-#define PORTC_LCKR_REGISTER (PORTC_BASE_ADDRESS + 0x1C)
-#define PORTC_AFR1_REGISTER (PORTC_BASE ADDRESS + 0x20)
-#define PORTC_AFR2_REGISTER (PORTC_BASE_ADDRESS + 0x24)
+#define PORTC_BASE_ADDRESS          ((uint32_t)0x40020800) 
+#define PORTC_MODER_REGISTER        (PORTC_BASE_ADDRESS + 0x00)
+#define PORTC_OTYPER_REGISTER       (PORTC_BASE_ADDRESS + 0x04)
+#define PORTC_OSPEEDR_REGISTER      (PORTC_BASE_ADDRESS + 0x08)
+#define PORTC_PUPDR_REGISTER        (PORTC_BASE_ADDRESS + 0x0C)
+#define PORTC_IDR_REGISTER          (PORTC_BASE_ADDRESS + 0x10)
+#define PORTC_ODR_REGISTER          (PORTC_BASE_ADDRESS + 0x14)
+#define PORTC_BSRRL_REGISTER        (PORTC_BASE_ADDRESS + 0x18)
+#define PORTC_BSRR_REGISTER         (PORTC_BASE_ADDRESS + 0x18)
+#define PORTC_BSRRH_REGISTER        (PORTC_BASE_ADDRESS + 0x1A)
+#define PORTC_LCKR_REGISTER         (PORTC_BASE_ADDRESS + 0x1C)
+#define PORTC_AFR1_REGISTER         (PORTC_BASE_ADDRESS + 0x20)
+#define PORTC_AFR2_REGISTER         (PORTC_BASE_ADDRESS + 0x24)
 
 // flags MODER Register:
 #define GPIO_0_MODER                0x03
@@ -285,4 +285,59 @@ uint32_t checkGPIOC6(void)
     reg_pointer = (uint32_t *) PORTC_IDR_REGISTER;
     valueC6 = *reg_pointer & GPIO_6_IDR;
     return valueC6;   
+}
+
+
+void initGpioB0AsAF2( void )
+{
+    uint32_t *reg_pointer;
+
+    /* GPIGB Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd (RCC_AHB1Periph_GPIOB, ENABLE);
+    
+    /* GPIO B as an alternative function */
+    reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t)0b11)); // Clear the bit
+    *reg_pointer = *reg_pointer | GPIO_0_MODER_AF; // Set as AF
+    /* GPIO B 0 push pull output */
+    reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t) 0b1)); // Clear the bit
+    *reg_pointer = *reg_pointer | 0b00; // Just for completenes, obviously not needed
+    /* GPIO B 0 floating */
+    reg_pointer = (uint32_t *)PORTB_PUPDR_REGISTER;
+    *reg_pointer = *reg_pointer & (~( (uint32_t)0b11)); // Clear the bit
+    *reg_pointer = *reg_pointer | 0b00; // Set as floating
+    /* GPIO BO as alternative function 2 */
+    reg_pointer = (uint32_t *)PORTB_AFR1_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_AFR1)); // Clear the bit
+    *reg_pointer = *reg_pointer | GPIO_0_AFR1_AF2; // Set as alt func 2
+}
+
+
+void initGpioC6AsAF2( void )
+{
+    uint32_t *reg_pointer;
+
+    /* GPIOC Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd (RCC_AHB1Periph_GPIOC, ENABLE);
+
+    /* GPIOC pin 6 alternative function */
+    reg_pointer = (uint32_t * )PORTC_MODER_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t) GPIO_6_MODER)); // Clear the bit
+    *reg_pointer = *reg_pointer | GPIO_6_MODER_AF; // Set mode to AF
+    /* GPIOC pin 6 push pull */
+    reg_pointer = (uint32_t *)PORTC_OTYPER_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_OTYPER)); // Clear the bit
+    *reg_pointer = *reg_pointer | GPIO_6_OTYPER_PP; // Set to push pull
+    /* GPIOC pin 6 high speed (not necessary) */ 
+    reg_pointer = (uint32_t *)PORTC_OSPEEDR_REGISTER;
+    *reg_pointer = *reg_pointer | GPIO_6_OSPEEDR_HIGH_SPEED; // Set to high speed
+    /* GPIOC pin 6 pulled up */
+    reg_pointer = (uint32_t *)PORTC_PUPDR_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_PUPDR)); // Clear the bit
+    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PU; // Set to pull up
+    /* GPIOC pin 6 alternative function 2 */
+    reg_pointer = (uint32_t *) PORTC_AFR1_REGISTER;
+    *reg_pointer = *reg_pointer & (~((uint32_t) GPIO_6_AFR1));
+    *reg_pointer = *reg_pointer | GPIO_6_AFR1_AF2; // Set to alt func 2
 }
