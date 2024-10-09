@@ -165,8 +165,6 @@ uint16_t getCaptureTimer3CH1( void )
     }
     return 0;
 }
-
-
 void clearTimer3StatusRegister( void )
 {
     // Set status register to 0

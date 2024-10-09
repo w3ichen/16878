@@ -357,3 +357,4 @@ void initGpioC6AsAF2( void )
     *reg_pointer = *reg_pointer & (~((uint32_t) GPIO_6_AFR1));
     *reg_pointer = *reg_pointer | GPIO_6_AFR1_AF2; // Set to alt func 2
 }
+
