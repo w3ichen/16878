@@ -9,8 +9,8 @@
 // #define HELLO_WORLD
 // #define PART1_Q1
 // #define PART1_Q2
-#define PART1_Q3
-// #define PART1_Q4
+// #define PART1_Q3
+#define PART1_Q4
 // --------------------------
 
 
@@ -30,18 +30,20 @@ void delay(int num){
 int main (void){
     /* Variable declarations */
     uint16_t timer_val = 0;
+    static uint16_t prev_printed_val = 0;
     /* Initializations */
     initTimer3CH1AsInputCaptureOnPC6(); // Setup PortC6 and Timer3 channel 1 as an input capture
-
     while (1){
         // 
         // Read the input capture flag from the status register
         timer_val = getCaptureTimer3CH1();
-        if (timer_val > 0) {
+        if (timer_val > 0 && (timer_val != prev_printed_val)) {
             // If triggered, clear it and print the timer value to the screen.
             clearTimer3StatusRegister();
             printf("Timer Value = %d\n", timer_val);
+            prev_printed_val = timer_val;
         }
+
     }
 }
 #endif

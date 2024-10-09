@@ -329,27 +329,31 @@ void initGpioB0AsAF2( void )
 void initGpioC6AsAF2( void )
 {
     uint32_t *reg_pointer;
-
+    // (1) Enable the AHB1 clock
     /* GPIOC Peripheral clock enable */
-    RCC_AHB1PeriphClockCmd (RCC_AHB1Periph_GPIOC, ENABLE);
-
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+    // (2) Set MODER6 in the GPIOC_MODER register to Alternative function mode
     /* GPIOC pin 6 alternative function */
     reg_pointer = (uint32_t * )PORTC_MODER_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t) GPIO_6_MODER)); // Clear the bit
-    *reg_pointer = *reg_pointer | GPIO_6_MODER_AF; // Set mode to AF
+    *reg_pointer = *reg_pointer | GPIO_6_MODER_AF; // Set mode to AF2
+    // (3) Set Port C pin 6 to push-pull in the GPIOC_OTYPER register
     /* GPIOC pin 6 push pull */
     reg_pointer = (uint32_t *)PORTC_OTYPER_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_OTYPER)); // Clear the bit
     *reg_pointer = *reg_pointer | GPIO_6_OTYPER_PP; // Set to push pull
+    // (4) Set Port C pin 6 to High Speed port in the OSPEEDR register
     /* GPIOC pin 6 high speed (not necessary) */ 
     reg_pointer = (uint32_t *)PORTC_OSPEEDR_REGISTER;
     *reg_pointer = *reg_pointer | GPIO_6_OSPEEDR_HIGH_SPEED; // Set to high speed
-    /* GPIOC pin 6 pulled up */
+    // (5) Set Port C pin 6 to not have a pull-up or pull-down by clearing the bits in the PUPDR register
+    // Note: this depends on what you have connected to the input capture pin which generates your signal.
     reg_pointer = (uint32_t *)PORTC_PUPDR_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_PUPDR)); // Clear the bit
-    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PU; // Set to pull up
+    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PD; //* GPIOC pin 6 pulled down */
+    // (6) Set Port C pin 6 to alternative function 2 by writing 0x2000000 in the AFRL0 bits of the AFRL register
     /* GPIOC pin 6 alternative function 2 */
-    reg_pointer = (uint32_t *) PORTC_AFR1_REGISTER;
+    reg_pointer = (uint32_t *)PORTC_AFR1_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t) GPIO_6_AFR1));
     *reg_pointer = *reg_pointer | GPIO_6_AFR1_AF2; // Set to alt func 2
 }

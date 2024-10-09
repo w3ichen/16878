@@ -125,47 +125,47 @@ void initTimer3CH1AsInputCaptureOnPC6( void )
 {
     uint16_t *reg_pointer_16;
     initGpioC6AsAF2(); // initialize port C6 as alternate function
-    /* Timer 3 APB elock enable */
+    // (1) Enable the APB1 clock
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    
-     // Set status register to 0
+     // (2) Clear the update event flag in the status register TIM3_SR
     reg_pointer_16 = (uint16_t *)TIM3_STATUS_REGISTER;
     *reg_pointer_16 = 0;
-    // Compute and set prescaler register
+    // (3) Upload the pre-scale value to TIM3_PSC
     reg_pointer_16 = (uint16_t *) TIM3_PRESCALER_REGISTER;
     uint16_t prescalerValue2 = 9999;
     *reg_pointer_16 = prescalerValue2;
-    // Set autoreloader register
+    // (4) Set the wanted period value to the autoreload register TIM3_ARR
     reg_pointer_16 = (uint16_t *)TIM3_AUTORELOAD_REGISTER;
-    uint16_t autoreloadValue = 0xFFFF; 
+    uint16_t autoreloadValue = 10000; // Counts up to this number 
     *reg_pointer_16 = autoreloadValue;
-
+    // (5) Set the input capture CC1S bits to have CC1 channel configured as an input, 
+    // and mapped to TI1 by setting a 0x01 to the CCMR1 register.
     // Setup the TIM 3 channel 1 as input, CC1S bits are writable only when the channel is off.
     // After reset, all channels are turned off.
     reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_1_REGISTER;
-    *reg_pointer_16 = *reg_pointer_16 | TIM_CCMR13_CC1S_INPUT_TI1 | TIM_CCMR13_IC1F_N8; //experimented with filter but it doesn't seem to do anything
+    *reg_pointer_16 = *reg_pointer_16 | TIM_CCMR13_CC1S_INPUT_TI1 | TIM_CCMR13_IC1F_N8; // experimented with filter but it doesn't seem to do anything
+    // (6) Enable the TIM3 channel 1 by setting the CC1E bit in the CCER register
+    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_ENABLE_REGISTER;
+    *reg_pointer_16 = *reg_pointer_16 | TIM3_CCER_CC1E;
+    // (7) Enable the timer subsystem by setting the CEN bit in TIM3_CR1
+    reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1;
+    *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
 }
 
 
 // Read the input capture flag from the status register
 uint16_t getCaptureTimer3CH1( void )
 {
-    // uint16_t * reg_pointer_16;
-    // // Captures the value of timer at PC6 external signal
-    // Slide 26 in lecture 10, slide 14
-    // if (reg_ptr & tim_ch1)
-    // // 0x34 address.
-    // reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_1_REGISTER; // Point to the register
-    // return *reg_pointer_16 ; // Return the value in the register
+    uint16_t *reg_pointer_16;
+    reg_pointer_16 = (uint16_t *)TIM3_STATUS_REGISTER;
+    if (*reg_pointer_16 > 0){
+        // Only return if status 1, meaning there is a new value in register!
+        reg_pointer_16 = (uint16_t *)TIM3_COMPARE_1_REGISTER; // Point to capture input register
+        return *reg_pointer_16; // Return the value in the register
+    }
+    return 0;
 }
 
-// Read the input capture flag from the status register
-uint16_t getCaptureComparePB0( void )
-{
-    uint16_t * reg_pointer_16;
-    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_1_REGISTER; // Point to the register
-    return *reg_pointer_16 ; // Return the value in the register
-}
 
 void clearTimer3StatusRegister( void )
 {
