@@ -55,11 +55,9 @@ int main (void)
     initTimerAsOutputComparePB0();
     // No need for compare checks, it's mapped directly to LED.
     // AF2 - ties LED directly to the timer
-    while(1)
-    {
-    }
 }
 #endif
+
 
 #ifdef PART1_Q2
 // Sets LED state based on C6 input
