@@ -200,43 +200,55 @@
 void initGpioC6AsInput( void )
 {
     uint32_t *reg_pointer; 
+    // (1) Enable the AHB1 clock
     /* GPIOC Peripheral clock enable */
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+    // (2) Clear the MODER6 bits in the GPIOC_MODER register in order to have PortC6 as input.
     /* GPIOC Pin 6 as input*/
     reg_pointer = (uint32_t *)PORTC_MODER_REGISTER; // Mode register
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_MODER)); // Clear the bit
-    *reg_pointer = *reg_pointer | GPIO_6_MODER_IN; // Set to Input
-    /*PUSH-PULL Pin*/
+    *reg_pointer = *reg_pointer | GPIO_6_MODER_IN; // Set to Input -> OR 0x00 
+    // (3) Set Port C pin 6 to push-pull in the GPIOC_OTYPER register
+    /* PUSH-PULL Pin */
     reg_pointer = (uint32_t *)PORTC_OTYPER_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_OTYPER)); // Clear the bit
     *reg_pointer = *reg_pointer | GPIO_6_OTYPER_PP; // Set value
-    /*GPIOC pin 6 high speed */
+    // (4) Set Port C pin 6 to High Speed port in the OSPEEDR register
+    /* GPIOC pin 6 high speed */
     reg_pointer = (uint32_t *)PORTC_OSPEEDR_REGISTER;
     *reg_pointer = *reg_pointer | GPIO_6_OSPEEDR_HIGH_SPEED; // Set to high speed
-    /*Configure pulled-down*/
+    // (5) Set Port C pin 6 to be a pulled-down by setting the bits in the PUPDR register
+    // Don’t have anything connected to Pin 6 at the moment, it is better to either pull it up or down.
+    /* Configure pulled-down */
     reg_pointer = (uint32_t *) PORTC_PUPDR_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_6_PUPDR)); // Clear bit
-    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PD; // Set C6 input to LOW
-    // *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PU; // Set C6 input to HIGH
+    *reg_pointer = *reg_pointer | GPIO_6_PUPDR_PD; // Set to LOW to stop it floating
 }
+
 
 void initGpioB0AsOutput( void )
 {
     uint32_t  * reg_pointer;
+    // (1) Enable the AHB1 clock
     /* GPIOB Peripheral clock enable */
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    // (2) Set MODER0 in the GPIOB_MODER register to Output mode by writing 0x01
     /* GPIOB0 configured as output */
     reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_MODER)); // Clear the bit
-    *reg_pointer = *reg_pointer | GPIO_0_MODER_OUT; // Set as output
-    /*GPIOB0 configured as push-pull */
+    *reg_pointer = *reg_pointer | GPIO_0_MODER_OUT; // Set as output with 0x01
+    // (3) Set Port B pin 0 to push-pull in the GPIOB_OTYPER register
+    /* GPIOB0 configured as push-pull */
     reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_OTYPER)); // Clear bit
     *reg_pointer = *reg_pointer | GPIO_0_OTYPER_PP; // Set bit
-    /*GPIOB0 configured floating */
+    // (5) Set Port B pin 0 to not have a pull-up or pull-down by clearing the bits in the PUPDR register
+    // Since Port B pin 0 is connected to LED1, we do not need a pull-up or pull-down on it.
+    /* GPIOB0 configured floating */
     reg_pointer = (uint32_t *)PORTB_PUPDR_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_PUPDR)); // Clear bit
     *reg_pointer = *reg_pointer | GPIO_0_PUPDR_NOPULL; // Set to no pull
+    // (6) Can set Port B pin 0 to initialize as high or low by writing to the PORTB_ODR register.
     /* GPIOB0 driven high to start out with */
     reg_pointer = (uint32_t *)PORTB_ODR_REGISTER;
     *reg_pointer = *reg_pointer | GPIO_0_ODR_HIGH;
@@ -251,13 +263,10 @@ void toggleGPIOB0( void )
     // get the current value of the pin 
     reg_pointer = (uint32_t *)PORTB_ODR_REGISTER;
     value = *reg_pointer & GPIO_0_ODR_HIGH; // Get the bit from register
-    if (value > 0)
-    {
+    if (value > 0) {
         // if high, clear the bit (low)
         *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_ODR_HIGH));
-    }
-    else
-    {
+    } else {
         // if low, set the bit (high)
         *reg_pointer = *reg_pointer | GPIO_0_ODR_HIGH;
     } 
@@ -291,25 +300,28 @@ uint32_t checkGPIOC6(void)
 void initGpioB0AsAF2( void )
 {
     uint32_t *reg_pointer;
-
+    // (1) Enable the AHB1 clock
     /* GPIGB Peripheral clock enable */
-    RCC_AHB1PeriphClockCmd (RCC_AHB1Periph_GPIOB, ENABLE);
-    
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    // (2) Set MODER0 in the GPIOB_MODER register to Alternative function mode
     /* GPIO B as an alternative function */
     reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
     *reg_pointer = *reg_pointer & (~((uint32_t)0b11)); // Clear the bit
     *reg_pointer = *reg_pointer | GPIO_0_MODER_AF; // Set as AF
+    // (3) Set Port B pin 0 to push-pull in the GPIOB_OTYPER register
     /* GPIO B 0 push pull output */
     reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
-    *reg_pointer = *reg_pointer & (~((uint32_t) 0b1)); // Clear the bit
+    *reg_pointer = *reg_pointer & (~((uint32_t) 0b01)); // Clear the bit
     *reg_pointer = *reg_pointer | 0b00; // Just for completenes, obviously not needed
+    // (5) Set Port B pin 0 to not have a pull-up or pull-down by clearing the bits in the PUPDR register
     /* GPIO B 0 floating */
     reg_pointer = (uint32_t *)PORTB_PUPDR_REGISTER;
     *reg_pointer = *reg_pointer & (~( (uint32_t)0b11)); // Clear the bit
     *reg_pointer = *reg_pointer | 0b00; // Set as floating
+    // (6) Set Port B pin 0 to alternative function 2 by writing 0b0010 in the AFRL0 bits of the AFRL register
     /* GPIO BO as alternative function 2 */
     reg_pointer = (uint32_t *)PORTB_AFR1_REGISTER;
-    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_AFR1)); // Clear the bit
+    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_0_AFR1)); // Clear the bits
     *reg_pointer = *reg_pointer | GPIO_0_AFR1_AF2; // Set as alt func 2
 }
 

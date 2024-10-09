@@ -31,13 +31,13 @@
 #define TIM3_CAPTURE_COMPARE_MODE_2_REGISTER (TIM3_BASE_ADDRESS + 0x1C)
 
 // Flags for TIM3_CCMR registers:
-#define TIM_CCMR13_OC1M_0               (0b00010000)
-#define TIM_CCMR13_OC1M_1               (0b00100000)
-#define TIM_CCMR13_OC1M_2               (0b01000000)
+#define TIM_CCMR13_OC1M_0 (0b00010000)
+#define TIM_CCMR13_OC1M_1 (0b00100000)
+#define TIM_CCMR13_OC1M_2 (0b01000000)
+#define TIM_CCMR13_OCPE (0b00001000)
+#define TIM_CCMR13_OUTPUT 0x00
 #define TIM_CCMR13_OCM_012              (TIM_CCMR13_OC1M_2 | TIM_CMR13_OC1M_1 | TIM_CCMR13_OC1M_0)
 #define TIM_CCMR13_PWM1                 (TIM_CCMR13_OC1M_2 |TIM_CCMR13_OC1M_1)
-#define TIM_CCMR13_OCPE                 (0b00001000)
-#define TIM_CCMR13_OUTPUT               0x00
 #define TIM_CCMR13_CC1S_INPUT_TI1       0x01
 #define TIM_CCMR13_IC1F_N2              ((0x01)<<4)
 #define TIM_CCMR13_IC1F_N8              ((0x03)<<4)
@@ -88,32 +88,33 @@ void initTimer3( void )
 void initTimerAsOutputComparePB0( void )
 {
     uint16_t *reg_pointer_16; 
-
     initGpioB0AsAF2();
-
+    // (1) Enable the APB1 clock
     /* Timer 3 APB clock enable */
     RCC_APB1PeriphClockCmd (RCC_APB1Periph_TIM3, ENABLE);
-    // Set status register to 0
+    // (2) Clear the update event flag in the status register TIM3_SR
     reg_pointer_16 = (uint16_t *)TIM3_STATUS_REGISTER;
     *reg_pointer_16 = 0;
-    // Compute and set prescaler register
-    uint16_t PrescalerValue2 = 999; // (uint16 t) ((SystemCoreClock / 2) / 90000000) - 1:
+    // (3) Upload the pre-scale value to TIM3_PSC
+    uint16_t PrescalerValue2 = 9999; // For 1Hz
     reg_pointer_16 = (uint16_t *)TIM3_PRESCALER_REGISTER;
     *reg_pointer_16 = PrescalerValue2;
-    // Set autoreloader register
+    // (4) Set the wanted period value to the autoreload register TIM3_ARR
     reg_pointer_16 = (uint16_t *)TIM3_AUTORELOAD_REGISTER;
-    uint16_t autoreloadvalue = 0xFFFF;
+    uint16_t autoreloadvalue = 9000; // For 1Hz
     *reg_pointer_16 = autoreloadvalue;
-    // Setup OCREF to toggle with TIMx_CNT = TIMx_CCR3
+    // (5) Set the output compare mode to the OC3M bit fields in the CCMR2 register, and enable it as an output.
+    // Setup OCREF to toggle with TIMx_CNT = TIMx_CCR3. This sets it to toggle
     reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_2_REGISTER;
     *reg_pointer_16 = *reg_pointer_16 | TIM_CCMR13_OC1M_1 | TIM_CCMR13_OC1M_0 | TIM_CCMR13_OUTPUT;
-    // Set the compare value:
+    // (6) Set the value you want to compare to in CCR3
     reg_pointer_16 = (uint16_t *)TIM3_COMPARE_3_REGISTER;
     *reg_pointer_16 = autoreloadvalue/2;
+    // (7) Enable the TIM3 channel 3 by setting the CC3E bit in the CCER register
     // Enable the TIM3 channel 3 and keep the default configuration for channel polarity
     reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_ENABLE_REGISTER;
     *reg_pointer_16 = *reg_pointer_16 | TIM3_CCER_CC3E;
-    // Enable TIM3
+    // (8) Enable the timer subsystem by setting the CEN bit in TIM3_CR1
     reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1;
     *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
 }
@@ -148,6 +149,18 @@ void initTimer3CH1AsInputCaptureOnPC6( void )
 
 // Read the input capture flag from the status register
 uint16_t getCaptureTimer3CH1( void )
+{
+    // uint16_t * reg_pointer_16;
+    // // Captures the value of timer at PC6 external signal
+    // Slide 26 in lecture 10, slide 14
+    // if (reg_ptr & tim_ch1)
+    // // 0x34 address.
+    // reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_1_REGISTER; // Point to the register
+    // return *reg_pointer_16 ; // Return the value in the register
+}
+
+// Read the input capture flag from the status register
+uint16_t getCaptureComparePB0( void )
 {
     uint16_t * reg_pointer_16;
     reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_1_REGISTER; // Point to the register

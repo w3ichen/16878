@@ -9,10 +9,12 @@
 // #define HELLO_WORLD
 // #define PART1_Q1
 // #define PART1_Q2
-// #define PART1_Q3
-#define PART1_Q4
+#define PART1_Q3
+// #define PART1_Q4
 // --------------------------
 
+
+// -- Helper functions ------------------------
 
 void delay(int num){
     for (int i=0; i<num; i++){
@@ -21,46 +23,50 @@ void delay(int num){
 }
 
 
-// TODO: not working!!!
-// #ifdef PART1_Q4
-// int main (void){
-//     /* Variable declarations */
-//     uint16_t timer_val = 0;
-//     /* Initializations */
-//     initTimer3CH1AsInputCaptureOnPC6(); // Setup PortC6 and Timer3 channel 1 as an input capture
+// -- Main functions ------------------------
 
-//     while (1){
-//         // Read the input capture flag from the status register
-//         timer_val = getCaptureTimer3CH1();
-//         if (timer_val > 0) {
-//             // If triggered, clear it and print the timer value to the screen.
-//             clearTimer3StatusRegister();
-//             printf("Timer Value = %d\n", timer_val);
-//         }
-//     }
-// }
-// #endif
+#ifdef PART1_Q4
+// Reads input capture flag and prints it
+int main (void){
+    /* Variable declarations */
+    uint16_t timer_val = 0;
+    /* Initializations */
+    initTimer3CH1AsInputCaptureOnPC6(); // Setup PortC6 and Timer3 channel 1 as an input capture
 
-// TODO: not working!!!
-// #ifdef PART1_Q3
-// int main (void)
-// {
-//     /* Initializations */
-//     init_LED1(); 
-//     initTimerAsOutputComparePB0();
-//     while(1)
-//     {
-//         toggle_LED1();
+    while (1){
+        // 
+        // Read the input capture flag from the status register
+        timer_val = getCaptureTimer3CH1();
+        if (timer_val > 0) {
+            // If triggered, clear it and print the timer value to the screen.
+            clearTimer3StatusRegister();
+            printf("Timer Value = %d\n", timer_val);
+        }
+    }
+}
+#endif
 
-//     }
-// }
-// #endif
-
-#ifdef PART1_Q2
+#ifdef PART1_Q3
+// Toggle LED at 1Hz using output compare toggle mode
 int main (void)
 {
     /* Initializations */
-    init_LED1(); //uncomment once you have filled in the function
+    init_LED1(); 
+    initTimerAsOutputComparePB0();
+    // No need for compare checks, it's mapped directly to LED.
+    // AF2 - ties LED directly to the timer
+    while(1)
+    {
+    }
+}
+#endif
+
+#ifdef PART1_Q2
+// Sets LED state based on C6 input
+int main (void)
+{
+    /* Initializations */
+    init_LED1();
     while(1)
     {
         set_LED1_to_C6();
@@ -69,7 +75,9 @@ int main (void)
 }
 #endif
 
+
 #ifdef PART1_Q1
+// Toggles LED on and off with delay
 int main (void)
 {
     /* Initializations */
@@ -83,6 +91,7 @@ int main (void)
 #endif
 
 #ifdef HELLO_WORLD
+// Prints hello world
 int main (void)
 {
     while(1)
