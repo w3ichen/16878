@@ -3,6 +3,7 @@
 #include "nucleo_led.h"
 #include "hardware_stm_timer3.h"
 #include "hardware_stm_timer3.h"
+#include "hardware_stm_interruptcontroller.h"
 
 // --------------------------
 // Select code to run
@@ -11,7 +12,8 @@
 // #define PART1_Q2
 // #define PART1_Q3
 // #define PART1_Q4
-#define PART1_Q5
+// #define PART1_Q5
+#define PART1_Q6
 
 // --------------------------
 
@@ -26,6 +28,18 @@ void delay(int num){
 
 
 // -- Main functions ------------------------
+#ifdef PART1_Q6
+// Timer 3 channel 3 in output compare interrupt mode
+int main( void ){
+    // Setup PortB pin 0 as an output so you can access LED1.
+    init_LED1_output();
+    // Setup Timer 3 channel 3 in output compare mode and enable the interrupts both
+    // on output compare as well as Overflow.
+    initTimer3ToInterrupt();
+    TIM3_IRQHandler();
+}
+#endif
+
 
 #ifdef PART1_Q5
 // Toggling LED1 using timer 3 channel 3 in PWM mode

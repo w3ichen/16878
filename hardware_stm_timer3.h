@@ -3,7 +3,7 @@
 #define __HARDWARE_STM_TIMER3_H_
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
