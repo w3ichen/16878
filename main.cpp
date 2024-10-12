@@ -13,10 +13,10 @@
 // #define PART1_Q3
 // #define PART1_Q4
 // #define PART1_Q5
-#define PART1_Q6
+// #define PART1_Q6
+#define PART1_Q7
 
 // --------------------------
-
 
 // -- Helper functions ------------------------
 
@@ -28,6 +28,13 @@ void delay(int num){
 
 
 // -- Main functions ------------------------
+#ifdef PART1_Q7
+// External interrupt 6 using portC pin 6
+int main( void ){
+    enableEXTI6OnPortC();
+    EXTI9_5_IRQHandler();
+}
+#endif
 
 
 #ifdef PART1_Q6

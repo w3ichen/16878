@@ -7,7 +7,17 @@
 #define NVIC_INTERRUPT_SET_ENABLE_REGISTER_0_31         (NVIC_BASE_ADDRESS)
 #define NVIC_INTERRUPT_SET_ENABLE_REGISTER_32_63        (NVIC_BASE_ADDRESS+0x4)
 #define NVIC_INTERRUPT_SET_ENABLE_REGISTER_64_95        (NVIC_BASE_ADDRESS+0x8)
+#define NVIC_INTERRUPT_CLEAR_ENABLE_REGISTER_0_31       (NVIC_BASE_ADDRESS + 0x80)
+#define NVIC_INTERRUPT_CLEAR_ENABLE_REGISTER_32_63      (NVIC_INTERRUPT_CLEAR_ENABLE_REGISTER_0_31 + 0x4)
+#define NVIC_INTERRUPT_CLEAR_ENABLE_REGISTER_64_95      (NVIC_INTERRUPT_CLEAR_ENABLE_REGISTER_0_31 + 0x8)
+#define NVIC_INTERRUPT_SET_PENDING_REGISTER_0_31        (NVIC_BASE_ADDRESS + 0x100)
+#define NVIC_INTERRUPT_SET_PENDING_REGISTER_32_63       (NVIC_INTERRUPT_SET_PENDING_REGISTER_0_31 + 0x4)
+#define NVIC_INTERRUPT_SET_PENDING_REGISTER_64_95       (NVIC_INTERRUPT_SET_PENDING_REGISTER_0_31 + 0x8)
+#define NVIC_INTERRUPT_CLEAR_PENDING_REGISTER_0_31      (NVIC_BASE_ADDRESS + 0x180)
+#define NVIC_INTERRUPT_CLEAR_PENDING_REGISTER_32_63     (NVIC_INTERRUPT_CLEAR_PENDING_REGISTER_0_31 + 0x4)
+#define NVIC_INTERRUPT_CLEAR_PENDING_REGISTER_64_95     (NVIC_INTERRUPT_CLEAR_PENDING_REGISTER_0_31 + 0x8)
 #define TIM3_INTERRUPT_BIT                              (0x20000000)
+#define EXTI9_5_INTERRUPT_BIT                           (0x800000)
 
 #define TIM3_BASE_ADDRESS                               ((uint32_t)0x40000400)
 // Timer 3 control register 1
@@ -41,6 +51,21 @@
 #define TIM3_COMPARE_4_REGISTER                         (TIM3_BASE_ADDRESS + 0x40)
 #define TIM3_PRESCALER_REGISTER                         (TIM3_BASE_ADDRESS + 0x28)
 #define TIM3_AUTORELOAD_REGISTER                        (TIM3_BASE_ADDRESS + 0X2C)
+// For external interrupts:
+#define SYSCFG_BASE_ADDRESS                             ((uint32_t)(0x40013800))
+#define SYSCFG_EXTERNAL_INTERRUPT_REGISTER_2            (SYSCFG_BASE_ADDRESS + 0x0C)
+#define SYSCFG_EXTERNAL_INTERRUPT_6_BITS                ((uint32_t)0xF00)  // Flags for External interrupt register 2
+#define SYSCFG_EXTERNAL_INTERRUPT_6_PORTC               ((uint32_t)0x200)
+// External interrupt controller :
+#define EXTERNAL_INTERRUPT_CONTROLLER_BASE_ADDRESS      ((uint32_t)(0x40013C00))
+#define EXTERNAL_INTERRUPT_CONTROLLER_MASK_REGISTER     (EXTERNAL_INTERRUPT_CONTROLLER_BASE_ADDRESS)
+#define EXTERNAL_INTERRUPT_CONTROLLER_MASK_REGISTER_EXTI6 ((uint32_t)0x40)  // Flags for external interrupt controller mask register
+#define EXTERNAL_INTERRUPT_CONTROLLER_RTSR              (EXTERNAL_INTERRUPT_CONTROLLER_BASE_ADDRESS+0x08)
+#define EXTERNAL_INTERRUPT_CONTROLLER_RTSR_EXTI6        ((uint32_t)0x40)
+#define EXTERNAL_INTERRUPT_CONTROLLER_FTSR              (EXTERNAL_INTERRUPT_CONTROLLER_BASE_ADDRESS+0x0C)
+#define EXTERNAL_INTERRUPT_CONTROLLER_FTSR_EXTI6        ((uint32_t)0x40)
+#define EXTERNAL_INTERRUPT_CONTROLLER_PENDING_REGISTER  (EXTERNAL_INTERRUPT_CONTROLLER_BASE_ADDRESS+0x14)
+#define EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6     ((uint32_t)0x40)
 
 
 void enableNVIC_Timer3(void)
@@ -114,5 +139,51 @@ void TIM3_IRQHandler(void)
         *reg_pointer_16_sr = ~((uint16_t)TIM_UIF);
         // Perform action, turn on LED
         setGPIOB0();
+    }
+}
+
+
+void enableEXTI6OnPortC(void)
+{
+    uint32_t *reg_pointer_32;
+    // Init GPIO 6 C as input. Setup PortC pin 6 as an input.
+    initGpioC6AsInput();
+    // As a test, Init GPIO B0 as output for debugging. 
+    // Setup PortB pin 0 as an output so you can access LED1.
+    initGpioB0AsOutput();
+    // Enable SYSCFG clock
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    // Map EXTI6 (External interrupt) to port C bit 6
+    reg_pointer_32 = (uint32_t *)SYSCFG_EXTERNAL_INTERRUPT_REGISTER_2;
+    // Clear EXTI6
+    *reg_pointer_32 = *reg_pointer_32 & ~SYSCFG_EXTERNAL_INTERRUPT_6_BITS;
+    // Set EXTI6 to Port C
+    *reg_pointer_32 = *reg_pointer_32 | SYSCFG_EXTERNAL_INTERRUPT_6_PORTC;
+    // Un-mask EXTI6 (ie. enable it)
+    reg_pointer_32 = (uint32_t *)EXTERNAL_INTERRUPT_CONTROLLER_MASK_REGISTER;
+    *reg_pointer_32 = *reg_pointer_32 | EXTERNAL_INTERRUPT_CONTROLLER_MASK_REGISTER_EXTI6;
+    // Trigger on rising edge
+    // Idea is to listen to rising edge trigger and then do action
+    reg_pointer_32 = (uint32_t *)EXTERNAL_INTERRUPT_CONTROLLER_RTSR;
+    *reg_pointer_32 = *reg_pointer_32 | EXTERNAL_INTERRUPT_CONTROLLER_RTSR_EXTI6;
+    // Set the NVIC to respond to EXTI9_5
+    // NOTE: there is not a specific function for EXTI6 but it is packed together 
+    // with EXTI5, EXTI7, EXTI8, and EXTI9 - hence EXTI9_5
+    reg_pointer_32 = (uint32_t *)NVIC_INTERRUPT_SET_ENABLE_REGISTER_0_31;
+    *reg_pointer_32 = EXTI9_5_INTERRUPT_BIT;
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+    // Toggle LED1 every time you see a rising edge on PortC pin 6. (Toggle in the
+    // interrupt service routine)
+    uint32_t * reg_pointer_32 = (uint32_t *)EXTERNAL_INTERRUPT_CONTROLLER_PENDING_REGISTER;
+
+    // Check which interrupt fired: check if EXTI6 bit in interrupt pending register is true
+    if ((*reg_pointer_32 & EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6) > 0) {
+        // Clear the interrupt, so doesn't get triggered again
+        *reg_pointer_32 = EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6;
+        // Toggle the LED
+        toggleGPIOB0();
     }
 }
