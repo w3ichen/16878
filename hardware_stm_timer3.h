@@ -16,6 +16,7 @@ void initTimerAsOutputComparePB0( void );
 void initTimer3CH1AsInputCaptureOnPC6( void );
 uint16_t getCaptureTimer3CH1( void );
 void clearTimer3StatusRegister( void );
+void initTimer3AsPWM( void );
 
 #ifdef __cplusplus
 }

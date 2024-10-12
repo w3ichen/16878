@@ -12,6 +12,12 @@
 #include "nucleo_led.h"
 
 /************************************
+* Initializes LED1 on the nucleo Board as output
+*************************************/
+void init_LED1_output(void){
+    initGpioB0AsOutput();
+}
+/************************************
 * Initializes LED1 on the nucleo Board which is connected to Port B Pin 0
 *************************************/
 void init_LED1(void )

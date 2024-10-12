@@ -10,7 +10,9 @@
 // #define PART1_Q1
 // #define PART1_Q2
 // #define PART1_Q3
-#define PART1_Q4
+// #define PART1_Q4
+#define PART1_Q5
+
 // --------------------------
 
 
@@ -24,6 +26,17 @@ void delay(int num){
 
 
 // -- Main functions ------------------------
+
+#ifdef PART1_Q5
+// Toggling LED1 using timer 3 channel 3 in PWM mode
+int main(void){
+    // Setup PortB pin 0 as an output so you can access LED1
+    init_LED1_output();
+    // Setup Timer 3 channel 3 in pwm mode and map the output to PortB pin 0.
+    initTimer3AsPWM();
+}
+#endif
+
 
 #ifdef PART1_Q4
 // Reads input capture flag and prints it

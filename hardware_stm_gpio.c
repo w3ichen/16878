@@ -252,7 +252,6 @@ void initGpioB0AsOutput( void )
     /* GPIOB0 driven high to start out with */
     reg_pointer = (uint32_t *)PORTB_ODR_REGISTER;
     *reg_pointer = *reg_pointer | GPIO_0_ODR_HIGH;
-        
 }
 
 void toggleGPIOB0( void )
@@ -296,7 +295,7 @@ uint32_t checkGPIOC6(void)
     return valueC6;   
 }
 
-
+// Set Port B pin 0 as AF2, which connects it to timer 3
 void initGpioB0AsAF2( void )
 {
     uint32_t *reg_pointer;

@@ -35,8 +35,10 @@
 #define TIM_CCMR13_OC1M_1 (0b00100000)
 #define TIM_CCMR13_OC1M_2 (0b01000000)
 #define TIM_CCMR13_OCPE (0b00001000)
+#define TIM_CCMR13_CC3S (0b00000011)
+#define TIM_CCRM13_OC3PE (0b00001000)
 #define TIM_CCMR13_OUTPUT 0x00
-#define TIM_CCMR13_OCM_012              (TIM_CCMR13_OC1M_2 | TIM_CMR13_OC1M_1 | TIM_CCMR13_OC1M_0)
+#define TIM_CCMR13_OCM_012              (TIM_CCMR13_OC1M_2 | TIM_CCMR13_OC1M_1 | TIM_CCMR13_OC1M_0)
 #define TIM_CCMR13_PWM1                 (TIM_CCMR13_OC1M_2 |TIM_CCMR13_OC1M_1)
 #define TIM_CCMR13_CC1S_INPUT_TI1       0x01
 #define TIM_CCMR13_IC1F_N2              ((0x01)<<4)
@@ -172,3 +174,42 @@ void clearTimer3StatusRegister( void )
     *reg_pointer_16 = 0;
 }
 
+
+void initTimer3AsPWM( void )
+{
+    uint16_t *reg_pointer_16; 
+    // Map the output of timer3 to PortB pin 0
+    initGpioB0AsAF2();
+    // (1) Enable the APB1 clock
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+    // (2) Clear the update event flag in the status register TIM3_SR
+    reg_pointer_16 = (uint16_t *)TIM3_STATUS_REGISTER;
+    *reg_pointer_16 = 0;
+    // (3) Upload the pre-scale value to TIM3_PSC
+    uint16_t PrescalerValue2 = 9999; // For 0.25Hz
+    reg_pointer_16 = (uint16_t *)TIM3_PRESCALER_REGISTER;
+    *reg_pointer_16 = PrescalerValue2;
+    // (4) Set the wanted period value to the autoreload register TIM3_ARR
+    reg_pointer_16 = (uint16_t *)TIM3_AUTORELOAD_REGISTER;
+    uint16_t autoreloadvalue = 36000; // For 0.25Hz
+    *reg_pointer_16 = autoreloadvalue; 
+    // (5) Select PWM Mode 1 for Timer 3 channel 3 by writing 110 to the OC3M bit fields in the CCMR2 register
+    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_2_REGISTER; // CCMR2
+    *reg_pointer_16 = *reg_pointer_16 & (~((uint32_t)TIM_CCMR13_OCM_012)); // Clear the OCM_012 bits
+    *reg_pointer_16 = *reg_pointer_16 | TIM_CCMR13_OC1M_2 | TIM_CCMR13_OC1M_1; // 110 
+    // (6) Set channel 3 of Timer 3 to an output by clearing the CC3S bits in the CCMR2 register
+    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_2_REGISTER; // CCMR2
+    *reg_pointer_16 = *reg_pointer_16 & (~((uint32_t)TIM_CCMR13_CC3S)); // clear last 2 bits
+    // (7) Set the value to compare to in CCR3, which will set the duty cycle. For example if CCR3 = autoreload/2, then the duty cycle will be 50%.
+    reg_pointer_16 = (uint16_t *)TIM3_COMPARE_3_REGISTER; // CCR3
+    *reg_pointer_16 = autoreloadvalue/2;
+    // (8) Enable the Preload register for Timer 3 channel 3 by setting the OC3PE bit in the CCMR2 register
+    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_2_REGISTER; // CCMR2
+    *reg_pointer_16 = *reg_pointer_16 | TIM_CCRM13_OC3PE;
+    // (9) Enable the TIM3 channel 3 by setting the CC3E bit in the CCER register
+    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_ENABLE_REGISTER; // CCER
+    *reg_pointer_16 = *reg_pointer_16 | TIM3_CCER_CC3E;
+    // (10) Enable the timer subsystem by setting the CEN bit in TIM3_CR1
+    reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1; // TIM3_CR1
+    *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
+}
