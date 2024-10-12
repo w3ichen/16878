@@ -59,7 +59,7 @@ void initTimer3ToInterrupt( void )
     uint16_t *reg_pointer_16;
     /* Timer 3 APB clock enable */
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    /*enable the interrupt that would go to timer 3*/
+    /* Enable the interrupt that would go to timer 3 */
     enableNVIC_Timer3();
     /* Clear any pending flags in the status register */
     reg_pointer_16 = (uint16_t *)TIM3_STATUS_REGISTER;
@@ -109,7 +109,7 @@ void TIM3_IRQHandler(void)
         clearGPIOB0();
     }
     // Check if Overflow triggered the interrupt: I.e. Timer Counter 3 >= Autorreload value
-    if (( (*reg_pointer_16_sr & TIM_UIF) > 0) && ( (*reg_pointer_16_dier & TIM_UPDATE_INTERRUPT_ENABLE) > 0)) {
+    if (( (*reg_pointer_16_sr & TIM_UIF) > 0) && ((*reg_pointer_16_dier & TIM_UPDATE_INTERRUPT_ENABLE) > 0)) {
         // Clear interrupt to stop firing
         *reg_pointer_16_sr = ~((uint16_t)TIM_UIF);
         // Perform action, turn on LED
