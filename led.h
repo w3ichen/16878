@@ -16,10 +16,13 @@
 
 /*Function definitions---------------------------------------------------------*/
 
-void init_LED1(void);
-void toggle_LED1( void);
-void set_LED1_to_C6( void );
-void init_LED1_output(void);
+void clear_all_LED(void);
+void set_red( void);
+void clear_red( void );
+void set_green( void);
+void clear_green( void );
+void set_blue( void);
+void clear_blue( void );
 
 #ifdef __cplusplus
 }
