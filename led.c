@@ -1,6 +1,9 @@
 #include "hardware_stm_gpio.h"
 
 
+void init_leds(void) {
+    initGpioB012AsOutput();
+}
 
 void set_red( void){
     setGPIOB0();

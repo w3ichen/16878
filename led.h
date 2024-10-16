@@ -15,7 +15,7 @@
 
 
 /*Function definitions---------------------------------------------------------*/
-
+void init_leds(void);
 void clear_all_LED(void);
 void set_red( void);
 void clear_red( void );

@@ -40,6 +40,7 @@ void setGPIOB1( void );
 void clearGPIOB1( void );
 void setGPIOB2( void );
 void clearGPIOB2( void );
+uint32_t checkGPIOC7(void);
 
 #ifdef __cplusplus
 }

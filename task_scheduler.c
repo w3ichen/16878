@@ -1,6 +1,7 @@
 #include "stm32f4xx_rcc_mort.h"
 #include "task_scheduler.h"
 #include <stdlib.h>
+#include "led.h"
 
 /* Queue ------------------------------------------------------------------*/
 // Push new state to end of queue
@@ -51,6 +52,21 @@ state_t pop(void){
 void tasks(state_t state){
   switch (state) {
         case READY:
+            break;
+        case RED_ON:
+            set_red();
+            clear_green();
+            clear_blue();
+            break;
+        case GREEN_ON:
+            clear_red();
+            set_green();
+            clear_blue();
+            break;
+        case BLUE_ON:
+            clear_red();
+            clear_green();
+            set_blue();
             break;
         default:
             break;

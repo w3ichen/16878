@@ -319,6 +319,16 @@ uint32_t checkGPIOC6(void)
     return valueC6;   
 }
 
+uint32_t checkGPIOC7(void)
+{
+    uint32_t valueC7;
+    uint32_t *reg_pointer;
+    // Get the current value of the pin
+    reg_pointer = (uint32_t *) PORTC_IDR_REGISTER;
+    valueC7 = *reg_pointer & GPIO_7_IDR;
+    return valueC7;   
+}
+
 // Set Port B pin 0 as AF2, which connects it to timer 3
 void initGpioB0AsAF2( void )
 {

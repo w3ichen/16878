@@ -1,7 +1,15 @@
 #include "main.h"
 #include "debug_mort.h"
-#include "nucleo_led.h"
-#include "hardware_stm_gpio.h"
+#include "led.h"
+#include "input_devices.h"
+#include <cstdint>
+
+
+void delay(int num){
+    for (int i=0; i<num; i++){
+        // busy wait
+    }
+}
 
 int main (void)
 {
@@ -15,7 +23,18 @@ int main (void)
             B1 = Green LED
             B2 = Blue LED
     */
-    initGpioC67AsInput();
-    initGpioB012AsOutput();
+    // Initializations
+    init_leds();
+    init_input_devices();
+
+    uint32_t btn, photo_trans;
+    while (1){
+        btn = read_button();
+        photo_trans = read_photo_trans();
+        printf("btn=%u | photo=%u\n", btn, photo_trans);
+        
+        delay(10000000);
+    }
+
 }
 
