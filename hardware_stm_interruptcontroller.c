@@ -183,7 +183,6 @@ void EXTI9_5_IRQHandler(void)
     if ((*reg_pointer_32 & EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6) > 0) {
         // Clear the interrupt, so doesn't get triggered again
         *reg_pointer_32 = EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6;
-        // Toggle the LED
-        toggleGPIOB0();
+        printf("BUTTON PRESSED!\n");
     }
 }

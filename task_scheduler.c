@@ -54,6 +54,7 @@ void tasks(state_t state){
         case READY:
             break;
         case RED_ON:
+            // Turn red on
             set_red();
             clear_green();
             clear_blue();

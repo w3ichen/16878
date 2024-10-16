@@ -16,8 +16,8 @@ int main (void)
     /* Initializations */
     /*
         Inputs:
-            C6 = Phototransistor input
-            C7 = User button press input
+            C6 = User button press input
+            C7 = Phototransistor input
         Outputs:
             B0 = Red LED
             B1 = Green LED
