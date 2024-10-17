@@ -2,6 +2,7 @@
 #ifndef __HARDWARE_STM_TIMER3_H_
 #define __HARDWARE_STM_TIMER3_H_
 
+#include <cstdint>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,6 +31,7 @@ void initTimer3CH1AsInputCaptureOnPC6( void );
 uint16_t getCaptureTimer3CH1( void );
 void clearTimer3StatusRegister( void );
 void initTimer3AsPWM( void );
+uint16_t readTim3Count(void);
 
 #ifdef __cplusplus
 }

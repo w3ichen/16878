@@ -24,7 +24,7 @@ void init_timer_ms(void) {
 
 // Get current time
 double get_timer_ms(void) {
-    double time_ms = ((double) high_counter)*MAX_TIME_BEFORE_OVERFLOW + ((double) getCaptureTimer3CH1())*TIM3_RESOLUTION;
+    double time_ms = ((double) high_counter)*MAX_TIME_BEFORE_OVERFLOW + ((double) readTim3Count())*TIM3_RESOLUTION;
     return time_ms;
 }
 

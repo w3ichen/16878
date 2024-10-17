@@ -4,6 +4,7 @@
 #include "task_scheduler.h"
 #include <cstdint>
 #include "hardware_stm_interruptcontroller.h"
+#include "timer.h"
 
 /* MACRO definitions----------------------------------------------------------*/
 #define SYSTEM_CONTROL_BASE_ADDRESS                     (0xE000E000)
@@ -150,11 +151,6 @@ void TIM3_IRQHandler(void)
 void enableEXTI6OnPortC(void)
 {
     uint32_t *reg_pointer_32;
-    // Init GPIO 6 C as input. Setup PortC pin 6 as an input.
-    initGpioC6AsInput();
-    // As a test, Init GPIO B0 as output for debugging. 
-    // Setup PortB pin 0 as an output so you can access LED1.
-    initGpioB0AsOutput();
     // Enable SYSCFG clock
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     // Map EXTI6 (External interrupt) to port C bit 6

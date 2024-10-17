@@ -12,6 +12,7 @@
 /* Types ---------------------------------------------------------*/
 // List of all events in event machine
 typedef enum {
+    READY,
     BUTTON_PRESSED,
     RED_ON,
     READ_RED,

@@ -216,3 +216,7 @@ void initTimer3AsPWM( void )
     *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
 }
 
+uint16_t readTim3Count (void) {
+    uint16_t *reg_pointer_16 = (uint16_t *) TIM3_COUNTER_REGISTER;
+    return *reg_pointer_16;
+}

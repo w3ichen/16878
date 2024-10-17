@@ -3,6 +3,8 @@
 
 void init_leds(void) {
     initGpioB012AsOutput();
+    // Start with all LEDs off
+    clear_all_LEDs();
 }
 
 void set_red( void){
@@ -24,7 +26,7 @@ void clear_blue( void ){
     clearGPIOB2();
 }
 
-void clear_all_LED(void) {
+void clear_all_LEDs(void) {
     clear_red();
     clear_green();
     clear_blue();
