@@ -12,11 +12,13 @@
 /* Types ---------------------------------------------------------*/
 // List of all events in event machine
 typedef enum {
-    READY,
     BUTTON_PRESSED,
     RED_ON,
+    READ_RED,
     GREEN_ON,
+    READ_GREEN,
     BLUE_ON,
+    READ_BLUE,
     PRINT_COLOR
 } event_t;
 
@@ -39,6 +41,7 @@ extern struct queue_t queue;
 
 /* Function definitions ---------------------------------------------------------*/
 void sched_event (event_t event);
+void task_scheduler(void);
 
 #ifdef __cplusplus
 }

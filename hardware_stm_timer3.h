@@ -10,7 +10,7 @@ extern "C" {
 #include "main.h"
 #include "task_scheduler.h"
 
-/* Types ---------------------------------------------------------*/
+/* Global Variables ---------------------------------------------------------*/
 // Subtimer node
 typedef struct SubtimerNode {
     double creation_time;
@@ -20,6 +20,7 @@ typedef struct SubtimerNode {
 } subtimer_node_t; // SubtimerNode type
 
 extern subtimer_node_t* subtimers_list; // Head of subtimerlist
+extern uint16_t high_counter; // For timer
 
 
 /* Function definitions---------------------------------------------------------*/
@@ -29,9 +30,6 @@ void initTimer3CH1AsInputCaptureOnPC6( void );
 uint16_t getCaptureTimer3CH1( void );
 void clearTimer3StatusRegister( void );
 void initTimer3AsPWM( void );
-void init_timer_ms(void);
-void incr_high_counter (void);
-
 
 #ifdef __cplusplus
 }

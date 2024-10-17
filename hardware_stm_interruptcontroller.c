@@ -3,6 +3,7 @@
 #include "hardware_stm_gpio.h"
 #include "task_scheduler.h"
 #include <cstdint>
+#include "hardware_stm_interruptcontroller.h"
 
 /* MACRO definitions----------------------------------------------------------*/
 #define SYSTEM_CONTROL_BASE_ADDRESS                     (0xE000E000)

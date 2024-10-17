@@ -1,14 +1,13 @@
 #include "stm32f4xx_rcc_mort.h"
 #include "hardware_stm_gpio.h"
 #include "hardware_stm_interruptcontroller.h"
+#include "input_devices.h"
 
 void init_input_devices(void) {
     initGpioC67AsInput();
     enableEXTI6OnPortC();
     EXTI9_5_IRQHandler();
 }
-
-
 
 // C6 input is button
 uint32_t read_button(void) {
