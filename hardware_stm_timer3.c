@@ -68,8 +68,8 @@
 #define TIM3_RESOLUTION                 0.1
 
 /* Global Variables ---------------------------------------------------------*/
-uint16_t high_counter; // For timer
-
+uint16_t high_counter = 0; // For timer
+subtimer_node_t* subtimers_list = NULL;
 
 /* Functions ---------------------------------------------------------*/
 
@@ -258,13 +258,13 @@ int delete_subtimer(subtimer_node_t* prev_node, subtimer_node_t* curr_node) {
 }
 
 // Add new subtimer to list
-void add_subtimer(double duration, state_t trigger_state) {
+void add_subtimer(double duration, event_t trigger_event) {
     // Allocate memory for subtimer item
     subtimer_node_t* new_node = malloc(sizeof(subtimer_node_t));
     new_node->creation_time = get_timer_ms(); // Current time
     new_node->next = NULL;
     new_node->duration = duration;
-    new_node->trigger_state = trigger_state;
+    new_node->trigger_event = trigger_event;
 
     // Add to end of list
    
@@ -298,7 +298,7 @@ void check_subtimers(void) {
         if (fabs(curr_time - node->creation_time) > node->duration){
             // Timer has timed out!
             // Schedule the duration event
-            sched_event(node->trigger_state);   
+            sched_event(node->trigger_event);   
             // Delete the timer
             delete_subtimer(prev_node, node);
         }

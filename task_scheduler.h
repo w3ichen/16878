@@ -10,7 +10,7 @@
 #include "main.h"
 
 /* Types ---------------------------------------------------------*/
-// List of all states in state machine
+// List of all events in event machine
 typedef enum {
     READY,
     BUTTON_PRESSED,
@@ -18,26 +18,27 @@ typedef enum {
     GREEN_ON,
     BLUE_ON,
     PRINT_COLOR
-} state_t;
+} event_t;
 
 // Queue node
 struct QueueNode {
-    state_t state;
+    event_t event;
     struct QueueNode* next; // Next node
     struct QueueNode* prev; // Previous node
 };
 typedef struct QueueNode queue_node_t; // QueueNode type
 
 // Defintion of FIFO queue
-struct {
+struct queue_t {
     queue_node_t* head;
     queue_node_t* tail;
     uint32_t size;
-} queue = {NULL, NULL, 0}; // Initial values
+};
+extern struct queue_t queue;
 
 
 /* Function definitions ---------------------------------------------------------*/
-void sched_event (state_t state);
+void sched_event (event_t event);
 
 #ifdef __cplusplus
 }

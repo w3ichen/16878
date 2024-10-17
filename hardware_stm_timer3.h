@@ -15,11 +15,11 @@ extern "C" {
 typedef struct SubtimerNode {
     double creation_time;
     double duration;
-    state_t trigger_state;
+    event_t trigger_event;
     struct SubtimerNode* next; // Next node
 } subtimer_node_t; // SubtimerNode type
 
-subtimer_node_t* subtimers_list; // Head of subtimerlist
+extern subtimer_node_t* subtimers_list; // Head of subtimerlist
 
 
 /* Function definitions---------------------------------------------------------*/

@@ -3,9 +3,18 @@
 #include <stdlib.h>
 #include "led.h"
 
+
+/* Global Variables ---------------------------------------------------------*/
+// Initialize queue
+struct queue_t queue = {
+    .head = NULL,
+    .tail = NULL,
+    .size = 0
+};
+
 /* Queue ------------------------------------------------------------------*/
-// Push new state to end of queue
-void sched_event(state_t state) {
+// Push new event to end of queue
+void sched_event(event_t event) {
     queue_node_t* new_node = malloc(sizeof(queue_node_t));
     if (queue.tail == NULL){
         // List is empty, this is the first time
@@ -23,15 +32,15 @@ void sched_event(state_t state) {
     queue.size++;
 }
 
-// Pop state from start of queue
-state_t pop_queue(void){
+// Pop event from start of queue
+event_t pop_queue(void){
     if (queue.head == NULL){
         // Nothing in queue, pop should not have been popped!
         return -1;
     }
-    // Get the state from the first node
+    // Get the event from the first node
     queue_node_t* head_node = queue.head;
-    state_t ret_state = head_node->state;
+    event_t ret_event = head_node->event;
     // Change the head
     queue.head = head_node->next;
     // Free memory of head
@@ -43,14 +52,14 @@ state_t pop_queue(void){
         queue.head = NULL;
         queue.tail = NULL;
     }
-    return ret_state;
+    return ret_event;
 }
 
 
 /* Task Scheduler ------------------------------------------------------------------*/
 // List of all tasks
-void tasks(state_t state){
-  switch (state) {
+void tasks(event_t event){
+  switch (event) {
         case READY:
             break;
         case RED_ON:
@@ -76,11 +85,11 @@ void tasks(state_t state){
 
 // Iterate through queue and schedules tasks in the queue
 void task_scheduler(void) {
-    state_t state;
+    event_t event;
     // Start at queue head and iterate through all pending tasks
     queue_node_t* node = queue.head;
     while (node != NULL) {
-        tasks(node->state);
+        tasks(node->event);
         node = node->next; // Go to next node
     }
 }
