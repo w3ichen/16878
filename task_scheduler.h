@@ -13,6 +13,7 @@
 // List of all states in state machine
 typedef enum {
     READY,
+    BUTTON_PRESSED,
     RED_ON,
     GREEN_ON,
     BLUE_ON,
@@ -20,12 +21,12 @@ typedef enum {
 } state_t;
 
 // Queue node
-struct Node {
+struct QueueNode {
     state_t state;
-    struct Node* next; // Next node
-    struct Node* prev; // Previous node
+    struct QueueNode* next; // Next node
+    struct QueueNode* prev; // Previous node
 };
-typedef struct Node queue_node_t; // Node type
+typedef struct QueueNode queue_node_t; // QueueNode type
 
 // Defintion of FIFO queue
 struct {
@@ -36,8 +37,7 @@ struct {
 
 
 /* Function definitions ---------------------------------------------------------*/
-void push(state_t state);
-
+void sched_event (state_t state);
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,18 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "task_scheduler.h"
+
+/* Types ---------------------------------------------------------*/
+// Subtimer node
+typedef struct SubtimerNode {
+    double creation_time;
+    double duration;
+    state_t trigger_state;
+    struct SubtimerNode* next; // Next node
+} subtimer_node_t; // SubtimerNode type
+
+subtimer_node_t* subtimers_list; // Head of subtimerlist
 
 
 /* Function definitions---------------------------------------------------------*/
@@ -17,6 +29,9 @@ void initTimer3CH1AsInputCaptureOnPC6( void );
 uint16_t getCaptureTimer3CH1( void );
 void clearTimer3StatusRegister( void );
 void initTimer3AsPWM( void );
+void init_timer_ms(void);
+void incr_high_counter (void);
+
 
 #ifdef __cplusplus
 }

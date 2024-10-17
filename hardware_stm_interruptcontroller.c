@@ -1,5 +1,8 @@
+#include "hardware_stm_timer3.h"
 #include "stm32f4xx_rcc_mort.h"
 #include "hardware_stm_gpio.h"
+#include "task_scheduler.h"
+#include <cstdint>
 
 /* MACRO definitions----------------------------------------------------------*/
 #define SYSTEM_CONTROL_BASE_ADDRESS                     (0xE000E000)
@@ -173,16 +176,25 @@ void enableEXTI6OnPortC(void)
     *reg_pointer_32 = EXTI9_5_INTERRUPT_BIT;
 }
 
+// External interrupts 9-5 handler
 void EXTI9_5_IRQHandler(void)
 {
-    // Toggle LED1 every time you see a rising edge on PortC pin 6. (Toggle in the
-    // interrupt service routine)
-    uint32_t * reg_pointer_32 = (uint32_t *)EXTERNAL_INTERRUPT_CONTROLLER_PENDING_REGISTER;
+    uint32_t *EXTI_pending_reg = (uint32_t *)EXTERNAL_INTERRUPT_CONTROLLER_PENDING_REGISTER;
+    uint16_t *status_reg = (uint16_t *)TIM3_STATUS_REGISTER;
+    uint16_t *interrupt_enable_reg = (uint16_t *)TIM3_INTERRUPT_ENABLE_REGISTER;
 
     // Check which interrupt fired: check if EXTI6 bit in interrupt pending register is true
-    if ((*reg_pointer_32 & EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6) > 0) {
+    if ((*EXTI_pending_reg & EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6) > 0) {
         // Clear the interrupt, so doesn't get triggered again
-        *reg_pointer_32 = EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6;
-        printf("BUTTON PRESSED!\n");
+        *EXTI_pending_reg = EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6;
+        sched_event(BUTTON_PRESSED);
+    } else if (((*status_reg & TIM_UIF) > 0) && 
+               ((*interrupt_enable_reg & TIM_UPDATE_INTERRUPT_ENABLE) > 0)) {
+        // If overflow interrupt has occured (check status register)
+        // And timer update interrupt is enabled
+        // Clear the interrupt
+        *status_reg = ~((uint16_t)TIM_UIF);
+        // Perform the action: increment the high counter
+        incr_high_counter();
     }
 }

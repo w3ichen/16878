@@ -41,6 +41,8 @@ void clearGPIOB1( void );
 void setGPIOB2( void );
 void clearGPIOB2( void );
 uint32_t checkGPIOC7(void);
+void initGpioB0AsAF2(void);
+void initGpioC6AsAF2(void);
 
 #ifdef __cplusplus
 }

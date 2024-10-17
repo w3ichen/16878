@@ -1,6 +1,9 @@
 #include "stm32f4xx_rcc_mort.h"
 #include "hardware_stm_gpio.h"
 #include "hardware_stm_timer3.h"
+#include <cstdint>
+#include <math.h>
+#include <stdlib.h>
 
 #define TIM3_BASE_ADDRESS               ((uint32_t)0x40000400)
 #define TIM3_CR1_REGISTER_1             (TIM3_BASE_ADDRESS + 0x00) // Timer 3 control register 1 -> accessed as a 16 bit register
@@ -61,7 +64,14 @@
 #define TIM3_CH1_IN_POLARITY_RISING     0x00
 #define TIM3_CH1_ENABLE                 0x01
 
+#define MAX_TIME_BEFORE_OVERFLOW        7274.4
+#define TIM3_RESOLUTION                 0.1
 
+/* Global Variables ---------------------------------------------------------*/
+uint16_t high_counter; // For timer
+
+
+/* Functions ---------------------------------------------------------*/
 
 // Initialize timer3
 void initTimer3( void )
@@ -79,7 +89,7 @@ void initTimer3( void )
     *reg_pointer_16 = PrescalerValue2;
     // Set the autoreload register to what to count ti
     reg_pointer_16 = (uint16_t *)TIM3_AUTORELOAD_REGISTER;
-    *reg_pointer_16 = 65500;
+    *reg_pointer_16 = 65535;
     // Set the CR1 register
     reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1;
     // Disabling update (UDIS)
@@ -212,4 +222,88 @@ void initTimer3AsPWM( void )
     // (10) Enable the timer subsystem by setting the CEN bit in TIM3_CR1
     reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1; // TIM3_CR1
     *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
+}
+
+// Initialize timer ms
+void init_timer_ms(void) {
+    high_counter = 0;
+    initTimer3();
+}
+
+// Get current time
+double get_timer_ms(void) {
+    double time_ms = ((double) high_counter)*MAX_TIME_BEFORE_OVERFLOW + ((double) getCaptureTimer3CH1())*TIM3_RESOLUTION;
+    return time_ms;
+}
+
+// Increment high counter on overflow
+void incr_high_counter (void) {
+    high_counter++;
+}
+
+
+// Delete the timer from list
+int delete_subtimer(subtimer_node_t* prev_node, subtimer_node_t* curr_node) {
+    if (prev_node == NULL){
+        // No previous node, then set head to null
+        subtimers_list = NULL; // Empty list
+    } else {
+        // Change prev -> curr -> next
+        // Skip curr: prev -> next
+        prev_node->next = curr_node->next;
+    }
+    // Free curr node memory
+    free(curr_node);
+    return 0; // Success
+}
+
+// Add new subtimer to list
+void add_subtimer(double duration, state_t trigger_state) {
+    // Allocate memory for subtimer item
+    subtimer_node_t* new_node = malloc(sizeof(subtimer_node_t));
+    new_node->creation_time = get_timer_ms(); // Current time
+    new_node->next = NULL;
+    new_node->duration = duration;
+    new_node->trigger_state = trigger_state;
+
+    // Add to end of list
+   
+    if (subtimers_list == NULL) {
+        // First item in list, list is empty right now
+        subtimers_list = new_node;
+    } else {
+
+        subtimer_node_t* node = subtimers_list;
+        while (node->next != NULL) {
+            // Find the last node in list
+            node = node->next;
+        }
+        // Now node is the last node in list
+        node->next = new_node;
+    }
+
+
+}
+
+// Iterate through timers list and check for durations
+void check_subtimers(void) {
+    double curr_time;
+    subtimer_node_t* prev_node;
+    // Start at list head and iterate through all active timers
+    subtimer_node_t* node = subtimers_list;
+    while (node != NULL) {
+        curr_time = get_timer_ms();
+
+        // Take floating abs val of current time - creation time
+        if (fabs(curr_time - node->creation_time) > node->duration){
+            // Timer has timed out!
+            // Schedule the duration event
+            sched_event(node->trigger_state);   
+            // Delete the timer
+            delete_subtimer(prev_node, node);
+        }
+
+        prev_node = node; // Curr node becomes previous
+        node = node->next; // Go to next node
+    }
 }

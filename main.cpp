@@ -3,6 +3,7 @@
 #include "led.h"
 #include "input_devices.h"
 #include <cstdint>
+#include "hardware_stm_timer3.h"
 
 
 void delay(int num){
@@ -26,6 +27,7 @@ int main (void)
     // Initializations
     init_leds();
     init_input_devices();
+    init_timer_ms();
 
     uint32_t btn, photo_trans;
     while (1){

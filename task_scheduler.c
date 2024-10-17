@@ -5,7 +5,7 @@
 
 /* Queue ------------------------------------------------------------------*/
 // Push new state to end of queue
-void push(state_t state) {
+void sched_event(state_t state) {
     queue_node_t* new_node = malloc(sizeof(queue_node_t));
     if (queue.tail == NULL){
         // List is empty, this is the first time
@@ -24,7 +24,7 @@ void push(state_t state) {
 }
 
 // Pop state from start of queue
-state_t pop(void){
+state_t pop_queue(void){
     if (queue.head == NULL){
         // Nothing in queue, pop should not have been popped!
         return -1;
@@ -74,13 +74,14 @@ void tasks(state_t state){
     }
 }
 
-// Infinitely looped function that schedules tasks in the queue
+// Iterate through queue and schedules tasks in the queue
 void task_scheduler(void) {
     state_t state;
     // Start at queue head and iterate through all pending tasks
     queue_node_t* node = queue.head;
     while (node != NULL) {
         tasks(node->state);
+        node = node->next; // Go to next node
     }
 }
 
