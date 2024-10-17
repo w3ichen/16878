@@ -29,6 +29,5 @@ int main (void)
         // Check for tasks in queue and then execute them
         task_scheduler();
     }
-
 }
 
