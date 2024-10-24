@@ -173,6 +173,7 @@ void enableEXTI6OnPortC(void)
     *reg_pointer_32 = EXTI9_5_INTERRUPT_BIT;
 }
 
+
 // External interrupts 9-5 handler
 void EXTI9_5_IRQHandler(void)
 {
@@ -184,10 +185,11 @@ void EXTI9_5_IRQHandler(void)
     if ((*EXTI_pending_reg & EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6) > 0) {
         // Clear the interrupt, so doesn't get triggered again
         *EXTI_pending_reg = EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6;
+        // Schedule button pressed as next event
         sched_event(BUTTON_PRESSED);
     } else if (((*status_reg & TIM_UIF) > 0) && 
                ((*interrupt_enable_reg & TIM_UPDATE_INTERRUPT_ENABLE) > 0)) {
-        // If overflow interrupt has occured (check status register)
+        // If overflow interrupt has occurred (check status register)
         // And timer update interrupt is enabled
         // Clear the interrupt
         *status_reg = ~((uint16_t)TIM_UIF);

@@ -309,6 +309,7 @@ void clearGPIOB2( void )
     *reg_pointer = *reg_pointer & (~(uint32_t)0b100); // Clear bit
 }
 
+
 uint32_t checkGPIOC6(void)
 {
     uint32_t valueC6;
@@ -318,7 +319,6 @@ uint32_t checkGPIOC6(void)
     valueC6 = *reg_pointer & GPIO_6_IDR;
     return valueC6;   
 }
-
 uint32_t checkGPIOC7(void)
 {
     uint32_t valueC7;
@@ -417,7 +417,9 @@ void initGpioC67AsInput( void )
     *reg_pointer = *reg_pointer | (GPIO_6_PUPDR_PD + GPIO_7_PUPDR_PD); // Set to LOW to stop it floating
 }
 
-// Initialize B
+
+
+// Initialize B0, B1, B2 as outputs
 void initGpioB012AsOutput( void ) {
     uint32_t  * reg_pointer;
     // (1) Enable the AHB1 clock

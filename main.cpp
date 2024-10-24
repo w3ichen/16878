@@ -19,12 +19,12 @@ int main (void)
             B2 = Blue LED
     */
     // Initializations
-    init_leds();
-    init_input_devices();
-    init_timer_ms();
+    init_leds(); // Init leds to off
+    init_input_devices(); // Init gpio inputs 
+    init_timer_ms(); // Init the timer
 
     while (1){
-        // Check for any expired timers
+        // Check for any expired timers and update queue
         check_subtimers();
         // Check for tasks in queue and then execute them
         task_scheduler();

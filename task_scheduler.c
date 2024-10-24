@@ -27,25 +27,27 @@ struct {
 /* Queue ------------------------------------------------------------------*/
 // Push new event to end of queue
 void sched_event(event_t event) {
+    // Allocate memory for queue node
     queue_node_t* new_node = malloc(sizeof(queue_node_t));
-    new_node->event = event;
+    new_node->event = event; // Set event
     new_node->next = NULL; // At end of queue
     new_node->prev = queue.tail; // Point to last tail node
 
     if (queue.tail == NULL){
-        // List is empty, this is the first time
+        // List is empty, this is the first node so set tail and head
         queue.tail = new_node;
         queue.head = new_node;
     } else {
-        // Add to end of queue
+        // Not empty so add to end of queue
         // Current: tail -> NULL
         // Changed to: tail -> new_node (new tail) -> NULL
         queue.tail->next = new_node;
         queue.tail = new_node;
     }
-    // Increment size
+    // Increment queue's size
     queue.size++;
 }
+
 
 // Pop event from start of queue
 event_t pop_queue(void){
@@ -63,19 +65,20 @@ event_t pop_queue(void){
     // Decrement size
     queue.size--;
     if (queue.size == 0){
-        // Queue is now empty, make sure both head/tail are NULL
+        // If queue is now empty, make sure both head/tail are NULL
         queue.head = NULL;
         queue.tail = NULL;
     }
     return ret_event;
 }
 
-// Set all value to 0
+// Set all stored led values to 0
 void reset_led_vals( void ) {
     led_vals.red = 0;
     led_vals.green = 0;
     led_vals.blue = 0;
 }
+
 
 // Print gummy color based on measured led values
 void print_gummy_color ( void ) {
@@ -87,15 +90,18 @@ void print_gummy_color ( void ) {
             Green   |           |     X     |     X     |     X     |
             Blue    |           |           |           |     X     |
     */
+    // Extract stored led values
     uint8_t red = led_vals.red;
     uint8_t green = led_vals.green;
     uint8_t blue = led_vals.blue;
 
+    // Print led values to serial monitor
     printf("========= GUMMY BEAR COLOR =========\n");
     printf("RED LED = %d\n", led_vals.red);
     printf("GREEN LED = %d\n", led_vals.green);
     printf("BLUE LED = %d\n\n", led_vals.blue);
 
+    // Decision tree to determine which gummy bear color
     if (red && !green && !blue) {
         printf("GUMMY BEAR IS RED!\n");
     } else if (!red && green && !blue) {
@@ -109,7 +115,6 @@ void print_gummy_color ( void ) {
     }
 
     printf("====================================\n");
-
 }
 
 
@@ -194,4 +199,5 @@ void task_scheduler(void) {
         tasks(event);
     }
 }
+
 
