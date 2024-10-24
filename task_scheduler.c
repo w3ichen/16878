@@ -8,7 +8,7 @@
 #include "timer.h"
 
 
-#define LED_DELAY_MS 1000
+#define LED_DELAY_MS 500
 
 /* Global Variables ---------------------------------------------------------*/
 // Initialize queue
