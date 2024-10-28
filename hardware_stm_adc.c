@@ -1,0 +1,1 @@
+#include "hardware_stm_adc.h"
