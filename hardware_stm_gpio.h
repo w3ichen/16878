@@ -27,12 +27,9 @@
 
 
 /*Function definitions---------------------------------------------------------*/
-void initGpioB0AsOutput( void );
-void toggleGPIOB0( void );
-void setGPIOB0( void );
-void clearGPIOB0( void );
-void initGpioC6AsInput( void );
-uint32_t checkGPIOC6(void);
+void initGpioF7AsAnalog( void );
+void initGpioF789AsAnalog( void );
+
 
 #ifdef __cplusplus
 }

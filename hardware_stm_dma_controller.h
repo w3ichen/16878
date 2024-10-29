@@ -12,7 +12,10 @@
 
 /* Function definitions ---------------------------------------------------------*/
 uint16_t returnADC3StoredValue(uint8_t index);
-
+void enableDMAForAdc3_3channels( void );
+void initDMAForAdc3_3channels( void );
+void initDMAForAdc3_1channel( void );
+void enableDMAForAdc3_1channel( void );
 
 #ifdef __cplusplus
 }

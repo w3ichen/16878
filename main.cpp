@@ -23,7 +23,24 @@ void delay(int num){
 // Serial setup between pc and micrcontroller
 Serial pc(USBTX, USBRX);
 
+
 #ifdef PART1_Q1
+int main (void)
+{
+    initADC3_7_withDMA();
+    startADCConversion();
+
+    while (1) {
+        pc.printf("ADC value = %u; ", returnADC3StoredValue(0));
+
+        delay(100000);
+    }
+
+}
+#endif
+
+
+#ifdef PART1_Q2
 int main (void)
 {
     initADC3_567_withDMA();
