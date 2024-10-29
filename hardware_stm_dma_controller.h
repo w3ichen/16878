@@ -11,7 +11,7 @@
 
 
 /* Function definitions ---------------------------------------------------------*/
-
+uint16_t returnADC3StoredValue(uint8_t index);
 
 
 #ifdef __cplusplus

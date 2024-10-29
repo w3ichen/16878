@@ -11,7 +11,7 @@
 
 
 /* Function definitions ---------------------------------------------------------*/
-
+void initADC3_567_withDMA(void);
 
 
 #ifdef __cplusplus
