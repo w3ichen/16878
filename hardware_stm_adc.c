@@ -4,6 +4,24 @@
 #include "stm32f4xx_rcc_mort.h"
 #include <cstdint>
 
+#define ADC_3_BASE_ADDRESS      ((uint32_t)0x200) // 0x200 - 0x24C
+#define ADC_3_SR_REGISTER       (ADC_3_BASE_ADDRESS + 0x00)
+#define ADC_3_CR1_REGISTER      (ADC_3_BASE_ADDRESS + 0x04)
+#define ADC_3_CR2_REGISTER      (ADC_3_BASE_ADDRESS + 0x08)
+#define ADC_3_SMPR1_REGISTER    (ADC_3_BASE_ADDRESS + 0x0C)
+#define ADC_3_SMPR2_REGISTER    (ADC_3_BASE_ADDRESS + 0x10)
+#define ADC_3_SQR1_REGISTER     (ADC_3_BASE_ADDRESS + 0x2C)
+#define ADC_3_SQR2_REGISTER     (ADC_3_BASE_ADDRESS + 0x30)
+#define ADC_3_SQR3_REGISTER     (ADC_3_BASE_ADDRESS + 0x34)
+#define ADC_3_DR_REGISTER       (ADC_3_BASE_ADDRESS + 0x4C)
+#define ADC_COMMON_CCR_REGISTER (ADC_3_BASE_ADDRESS + 0x04)
+#define ADC_ALIGN               (uint32_t)(0x01<<11) // Bit 11 ALIGN: Data alignment
+#define ADC_EOCS                (uint32_t)(0x01<<10) // Bit 10 EOCS: End of conversion selection
+#define ADC_DDS                 (uint32_t)(0x01<<9) // Bit 9 DDS: DMA disable selection (for single ADC mode)
+#define ADC_DMA                 (uint32_t)(0x01<<8) // Bit 8 DMA: Direct memory access mode (for single ADC mode)
+#define ADC_CONT                (uint32_t)(0x01<<1) // Bit 1 CONT: Continuous conversion
+#define ADC_ADON                (uint32_t)(0x01<<0) // Bit 0 ADON: A/D Converter ON / OFF
+
 
 void initADC3_7_withDMA( void ) {
     uint32_t* reg_pointer;

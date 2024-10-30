@@ -172,7 +172,7 @@
 #define GPIO_6_AFR1                 0xF000000
 #define GPIO_6_AFR1_AF2             0x2000000
 
-// flags ODR Register:
+// Flags ODR Register:
 #define GPIO_0_ODR_HIGH             0x01
 #define GPIO_1_ODR_HIGH             (uint32_t)(0x01<<1)
 #define GPIO_2_ODR_HIGH             (uint32_t)(0x01<<2)
@@ -184,6 +184,13 @@
 #define GPIO_8_ODR_HIGH             (uint32_t)(0x01<<8)
 #define GPIO_9_ODR_HIGH             (uint32_t)(0x61<<9)
 #define GPIO_10_ODR_HIGH            (uint32_t)(0x01<<10)
+
+// Port F addresses:
+#define PORTF_BASE_ADDRESS          ((uint32_t)0x40021400) // 0x4002 1400 - 0x4002 17FF
+#define PORTF_MODER_REGISTER        (PORTF_BASE_ADDRESS + 0x00)
+#define PORTF_OTYPER_REGISTER       (PORTF_BASE_ADDRESS + 0x04)
+#define PORTF_OSPEEDR_REGISTER      (PORTF_BASE_ADDRESS + 0x08)
+#define PORTF_PUPDR_REGISTER        (PORTF_BASE_ADDRESS + 0x0C)
 
 /* function definitions----------------------------------------------------------*/
 void initGpioF7AsAnalog( void ) {
