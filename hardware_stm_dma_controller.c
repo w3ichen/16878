@@ -1,6 +1,7 @@
 #include "hardware_stm_dma_controller.h"
 #include "stm32f4xx_rcc_mort.h"
 #include <cstdint>
+#include "hardware_stm_adc.h"
 
 
 #define DMA2_BASE_ADDRESS       ((uint32_t) 0x40026400)
