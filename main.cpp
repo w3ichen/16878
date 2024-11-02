@@ -6,8 +6,8 @@
 
 // --------------------------
 // Select code to run
-#define PART1_Q1
-// #define PART1_Q2
+// #define PART1_Q1
+#define PART1_Q2
 
 // --------------------------
 // -- Helper functions ------
@@ -35,7 +35,7 @@ int main (void)
     while (1) {
         startADCConversion();
         pc.printf("F7 ADC value = %u;\n", returnADC3StoredValue(0));
-        
+
         delay(10);
     }
 }
@@ -48,13 +48,12 @@ int main (void)
     initADC3_567_withDMA();
     // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
     delay(1);
+    startADCConversion();
 
     while (1) {
-        startADCConversion();
-
         pc.printf("F7 ADC = %u; ", returnADC3StoredValue(0));
-        pc.printf("F8 ADC 2 = %u; ", returnADC3StoredValue(1));
-        pc.printf("F9 ADC 3 = %u\n", returnADC3StoredValue(2));
+        pc.printf("F8 ADC = %u; ", returnADC3StoredValue(1));
+        pc.printf("F9 ADC = %u\n", returnADC3StoredValue(2));
 
         delay(10);
     }
