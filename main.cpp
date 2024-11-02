@@ -28,16 +28,16 @@ Serial pc(USBTX, USBRX);
 int main (void)
 {
     initADC3_5_withDMA();
+    // initADC3_5_NoInterrupt(); // debug
     // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
-    delay(1);
-    startADCConversion();
+    delay(1); // dealy for ADC start
 
     while (1) {
-        pc.printf("ADC value = %u;\n", returnADC3StoredValue(0));
-
+        startADCConversion();
+        pc.printf("F7 ADC value = %u;\n", returnADC3StoredValue(0));
+        
         delay(10);
     }
-
 }
 #endif
 
@@ -48,12 +48,13 @@ int main (void)
     initADC3_567_withDMA();
     // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
     delay(1);
-    startADCConversion();
 
     while (1) {
-        pc.printf("ADC 1 = %u; ", returnADC3StoredValue(0));
-        pc.printf("ADC 2 = %u; ", returnADC3StoredValue(1));
-        pc.printf("ADC 3 = %u\n", returnADC3StoredValue(2));
+        startADCConversion();
+
+        pc.printf("F7 ADC = %u; ", returnADC3StoredValue(0));
+        pc.printf("F8 ADC 2 = %u; ", returnADC3StoredValue(1));
+        pc.printf("F9 ADC 3 = %u\n", returnADC3StoredValue(2));
 
         delay(10);
     }

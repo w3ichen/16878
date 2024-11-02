@@ -56,6 +56,7 @@ void initADC3_567_withDMA(void);
 void initADC3_5_withDMA(void);
 void startADCConversion(void);
 void printADC3dataRegister(void);
+void initADC3_5_NoInterrupt(void);
 
 #ifdef __cplusplus
 }

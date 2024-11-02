@@ -101,12 +101,12 @@ void enableDMAForAdc3_1channel( void ) {
 uint16_t returnADC3StoredValue(uint8_t index) {
     uint32_t* reg_pointer;
     uint16_t val;
-    // Debug: print ADC data register
-    printADC3dataRegister();
-    // Debug: print GPIO7 value
-    reg_pointer = (uint32_t *) PORTF_IDR_REGISTER;
-    val = *reg_pointer & GPIO_7_IDR;
-    printf("GPIO 7: %u\n", val);
+    // // Debug: print ADC data register
+    // printADC3dataRegister();
+    // // Debug: print GPIO7 value
+    // reg_pointer = (uint32_t *) PORTF_IDR_REGISTER;
+    // val = *reg_pointer & GPIO_7_IDR;
+    // printf("GPIO 7: %u\n", val);
     return adc_dma_buffer[index];
 }
 
