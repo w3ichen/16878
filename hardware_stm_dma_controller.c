@@ -2,6 +2,7 @@
 #include "stm32f4xx_rcc_mort.h"
 #include <cstdint>
 #include "hardware_stm_adc.h"
+#include "hardware_stm_gpio.h"
 
 
 #define DMA2_BASE_ADDRESS       ((uint32_t) 0x40026400)
@@ -23,11 +24,11 @@
 #define DMA_SxCR_PSIZE_HALF_WORD    (((uint32_t)1)<<11) // The peripheral data size is 16 bits in length
 #define DMA_SxCR_MINC_INCREMENT     (((uint32_t)1)<<10) // Increment the place where you store the data each transfer
 #define DMA_SxCR_CIRC_ENABLE        (((uint32_t)1)<<8) // ENABLE circular mode
-#define DMA_SxCR_DIR_PERTOMEM       0
-#define DMA_SxCR_STREAM_ENABLE      1
+#define DMA_SxCR_DIR_PERTOMEM       (uint32_t)0
+#define DMA_SxCR_STREAM_ENABLE      (uint32_t)1
 
 
-uint16_t adc_dma_buffer[3];
+uint16_t adc_dma_buffer[3] = {0, 0, 0};
 
 void initDMAForAdc3_3channels( void ) {
     uint32_t* reg_pointer;
@@ -98,6 +99,14 @@ void enableDMAForAdc3_1channel( void ) {
 }
 
 uint16_t returnADC3StoredValue(uint8_t index) {
+    uint32_t* reg_pointer;
+    uint16_t val;
+    // Debug: print ADC data register
+    printADC3dataRegister();
+    // Debug: print GPIO7 value
+    reg_pointer = (uint32_t *) PORTF_IDR_REGISTER;
+    val = *reg_pointer & GPIO_7_IDR;
+    printf("GPIO 7: %u\n", val);
     return adc_dma_buffer[index];
 }
 

@@ -13,7 +13,7 @@
 // -- Helper functions ------
 
 void delay(int num){
-    for (int i=0; i<num*100000000; i++){
+    for (int i=0; i<num*1000000; i++){
         // busy wait
     }
 }
@@ -27,13 +27,15 @@ Serial pc(USBTX, USBRX);
 #ifdef PART1_Q1
 int main (void)
 {
-    initADC3_7_withDMA();
+    initADC3_5_withDMA();
+    // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
+    delay(1);
     startADCConversion();
 
     while (1) {
-        pc.printf("ADC value = %u; ", returnADC3StoredValue(0));
+        pc.printf("ADC value = %u;\n", returnADC3StoredValue(0));
 
-        delay(100000);
+        delay(10);
     }
 
 }
@@ -44,6 +46,8 @@ int main (void)
 int main (void)
 {
     initADC3_567_withDMA();
+    // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
+    delay(1);
     startADCConversion();
 
     while (1) {
@@ -51,7 +55,7 @@ int main (void)
         pc.printf("ADC 2 = %u; ", returnADC3StoredValue(1));
         pc.printf("ADC 3 = %u\n", returnADC3StoredValue(2));
 
-        delay(100000);
+        delay(10);
     }
 
 }

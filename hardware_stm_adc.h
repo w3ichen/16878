@@ -24,6 +24,7 @@
 #define ADC_3_SQR3_REGISTER     (ADC_3_BASE_ADDRESS + 0x34)
 #define ADC_3_DR_REGISTER       (ADC_3_BASE_ADDRESS + 0x4C)
 #define ADC_COMMON_CCR_REGISTER (ADC_1_BASE_ADDRESS + 0x300 + 0x04) // Address offset: 0x04 (this offset address is relative to ADC1 base address + 0x300)
+#define ADC_EOC                 (uint32_t)(0x01<<1) // Bit 1 EOC: Regular channel end of conversion
 #define ADC_ALIGN               (uint32_t)(0x01<<11) // Bit 11 ALIGN: Data alignment
 #define ADC_EOCS                (uint32_t)(0x01<<10) // Bit 10 EOCS: End of conversion selection
 #define ADC_DDS                 (uint32_t)(0x01<<9) // Bit 9 DDS: DMA disable selection (for single ADC mode)
@@ -52,9 +53,9 @@
 
 /* Function definitions ---------------------------------------------------------*/
 void initADC3_567_withDMA(void);
-void initADC3_7_withDMA(void);
+void initADC3_5_withDMA(void);
 void startADCConversion(void);
-
+void printADC3dataRegister(void);
 
 #ifdef __cplusplus
 }
