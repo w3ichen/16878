@@ -33,9 +33,9 @@
 #define ADC_ADON                (uint32_t)(0x01<<0) // Bit 0 ADON: A/D Converter ON / OFF
 #define ADC_SCAN                (uint32_t)(0x01<<8) // Bit 8 SCAN: Scan mode
 #define ADC_PRESCALER_4         (uint32_t)(0x01<<16) // At Bits 17:16, 01: PCLK2 divided by 4
-#define ADC_1_CONVERSIONS       (uint32_t)(0x0000<<20) // 0000: 1 conversion at Bits 23:20 L[3:0]: Regular channel sequence length
-#define ADC_2_CONVERSIONS       (uint32_t)(0x0001<<20) // 0001: 2 conversions at Bits 23:20 L[3:0]: Regular channel sequence length   
-#define ADC_3_CONVERSIONS       (uint32_t)(0x0010<<20) // 0010: 3 conversions at Bits 23:20 L[3:0]: Regular channel sequence length
+#define ADC_1_CONVERSIONS       (uint32_t)(0b0000<<20) // 0000: 1 conversion at Bits 23:20 L[3:0]: Regular channel sequence length
+#define ADC_2_CONVERSIONS       (uint32_t)(0b0001<<20) // 0001: 2 conversions at Bits 23:20 L[3:0]: Regular channel sequence length   
+#define ADC_3_CONVERSIONS       (uint32_t)(0b0010<<20) // 0010: 3 conversions at Bits 23:20 L[3:0]: Regular channel sequence length
 #define ADC_CHANNEL_5_MORT2     (uint32_t)(0x05)
 #define ADC_CHANNEL_6_MORT2     (uint32_t)(0x06)
 #define ADC_CHANNEL_7_MORT2     (uint32_t)(0x07)
