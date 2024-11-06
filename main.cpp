@@ -34,7 +34,6 @@ int main (void)
     uint16_t analog_adc_val;
     float duty_cycle;
     int rotate_cw = 1;
-    int start_motor = 1;
 
     // Initalizations
     initADC3_5_withDMA(); // Init ADC for analog reading
