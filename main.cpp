@@ -7,7 +7,8 @@
 // --------------------------
 // Select code to run
 // #define PART1_Q1
-#define PART1_Q2
+// #define PART1_Q2
+#define PART2
 
 // --------------------------
 // -- Helper functions ------
@@ -23,24 +24,20 @@ void delay(int num){
 // Serial setup between pc and micrcontroller
 Serial pc(USBTX, USBRX);
 
-
-#ifdef PART1_Q1
+#ifdef PART2
 int main (void)
 {
     initADC3_5_withDMA();
-    // initADC3_5_NoInterrupt(); // debug
-    // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
-    delay(1); // dealy for ADC start
+    delay(1); // delay for ADC start
 
     while (1) {
         startADCConversion();
         pc.printf("F7 ADC value = %u;\n", returnADC3StoredValue(0));
-
+        // Max ADC output from potentiometer is ~3920
         delay(10);
     }
 }
 #endif
-
 
 #ifdef PART1_Q2
 int main (void)
@@ -60,3 +57,22 @@ int main (void)
 
 }
 #endif
+
+
+#ifdef PART1_Q1
+int main (void)
+{
+    initADC3_5_withDMA();
+    // initADC3_5_NoInterrupt(); // debug
+    // 11. NOTE: A conversion will not start until the SWSTART bit in CR2 bit is set, but we need to wait a few clock cycles for that.
+    delay(1); // delay for ADC start
+
+    while (1) {
+        startADCConversion();
+        pc.printf("F7 ADC value = %u;\n", returnADC3StoredValue(0));
+
+        delay(10);
+    }
+}
+#endif
+
