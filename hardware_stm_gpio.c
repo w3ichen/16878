@@ -98,53 +98,6 @@ void initGpioC8AsAF2( void )
     *reg_pointer = *reg_pointer | GPIO_8_AFR1_AF2; // Set as alt func 2
 }
 
-void initGpioB1AsOutput( void )
-{
-    uint32_t *reg_pointer;
-    // (1) Enable the AHB1 clock
-    /* GPIOB Peripheral clock enable */
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    // (2) Set MODER1 in the GPIOB_MODER register to Output mode by writing 0x01
-    /* GPIOB1 configured as output */
-    reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
-    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_1_MODER)); // Clear the bit
-    *reg_pointer = *reg_pointer | GPIO_1_MODER_OUT; // Set as output with 0x01
-    // (3) Set Port B pin 1 to push-pull in the GPIOB_OTYPER register
-    /* GPIOB1 configured as push-pull */
-    reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
-    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_1_OTYPER)); // Clear bit
-    *reg_pointer = *reg_pointer | GPIO_1_OTYPER_PP; // Set bit
-    // (5) Set Port B pin 1 to not have a pull-up or pull-down by clearing the bits in the PUPDR register
-    // Since Port B pin 1 is connected to LED1, we do not need a pull-up or pull-down on it.
-    /* GPIOB1 configured floating */
-    reg_pointer = (uint32_t *)PORTB_PUPDR_REGISTER;
-    *reg_pointer = *reg_pointer & (~((uint32_t)GPIO_1_PUPDR)); // Clear bit
-    *reg_pointer = *reg_pointer | GPIO_1_PUPDR_NOPULL; // Set to no pull
-    // (6) Can set Port B pin 1 to initialize as high or low by writing to the PORTB_ODR register.
-    /* GPIOB1 driven high to start out with */
-    reg_pointer = (uint32_t *)PORTB_ODR_REGISTER;
-    *reg_pointer = *reg_pointer | GPIO_1_ODR_HIGH;
-}
-
-void setGPIOB1( void )
-{
-    uint32_t *reg_pointer;
-    reg_pointer = (uint32_t *)PORTB_ODR_REGISTER; // Point to register
-    *reg_pointer = *reg_pointer | (0b010); // Set to 1
-}
-void clearGPIOB1( void )
-{
-    uint32_t *reg_pointer;
-    reg_pointer = (uint32_t *)PORTB_ODR_REGISTER; // Point to register
-    *reg_pointer = *reg_pointer & (~(uint32_t)(0b010)); // Clear bit
-}
-
-void enableMotor( void ) {
-    setGPIOB1();
-}
-void disableMotor( void ) {
-    clearGPIOB1();
-}
 
 float map_analog_value(int analog_adc_val) {
     // Max ADC output from potentiometer is ~3920

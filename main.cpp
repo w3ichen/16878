@@ -40,10 +40,6 @@ int main (void)
     initADC3_5_withDMA(); // Init ADC for analog reading
     initTimer3AsPWM(); // Init PWM signal at 30kHz
 
-    if (start_motor)
-        enableMotor();
-    else
-        disableMotor();
     if (rotate_cw) 
         initGpioB0AsAF2(); // Output PWM via B0
     else 

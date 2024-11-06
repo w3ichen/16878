@@ -223,11 +223,6 @@ void initGpioF7AsAnalog( void );
 void initGpioF789AsAnalog( void );
 void initGpioB0AsAF2( void );
 void initGpioC8AsAF2( void );
-void initGpioB1AsOutput( void );
-void setGPIOB1( void );
-void clearGPIOB1( void );
-void enableMotor( void );
-void disableMotor( void );
 float map_analog_value(int analog_adc_val);
 
 #ifdef __cplusplus
