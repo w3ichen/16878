@@ -3,6 +3,9 @@
 #include "mbed.h"
 #include "hardware_stm_adc.h"
 #include "hardware_stm_dma_controller.h"
+#include "hardware_stm_gpio.h"
+#include "hardware_stm_timer3.h"
+
 
 // --------------------------
 // Select code to run
@@ -27,17 +30,42 @@ Serial pc(USBTX, USBRX);
 #ifdef PART2
 int main (void)
 {
-    initADC3_5_withDMA();
+    // Variable declarations
+    uint16_t analog_adc_val;
+    float duty_cycle;
+    int rotate_cw = 1;
+    int start_motor = 1;
+
+    // Initalizations
+    initADC3_5_withDMA(); // Init ADC for analog reading
+    initTimer3AsPWM(); // Init PWM signal at 30kHz
+
+    if (start_motor)
+        enableMotor();
+    else
+        disableMotor();
+    if (rotate_cw) 
+        initGpioB0AsAF2(); // Output PWM via B0
+    else 
+        initGpioC8AsAF2(); // Output PWM via C8
+
     delay(1); // delay for ADC start
 
     while (1) {
         startADCConversion();
-        pc.printf("F7 ADC value = %u;\n", returnADC3StoredValue(0));
-        // Max ADC output from potentiometer is ~3920
+        analog_adc_val = returnADC3StoredValue(0);
+        pc.printf("potentiometer = %u;\n", analog_adc_val);
+        duty_cycle = map_analog_value(analog_adc_val);
+        pc.printf("duty_cycle = %f;\n", duty_cycle);
+
+        setTimer3PWMDutyCycle(duty_cycle); // Set value between 0 and 1
+
         delay(10);
     }
 }
 #endif
+
+
 
 #ifdef PART1_Q2
 int main (void)

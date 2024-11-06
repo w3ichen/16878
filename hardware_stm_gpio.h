@@ -189,9 +189,11 @@
 
 // flags AFR1 Register:
 #define GPIO_0_AFR1_AF2             2
-#define GPIO_0_AFR1                 0xF
+#define GPIO_0_AFR1                 0xF   
 #define GPIO_6_AFR1                 0xF000000
 #define GPIO_6_AFR1_AF2             0x2000000
+#define GPIO_8_AFR1_AF2             0b0010   
+#define GPIO_8_AFR1                 0xF
 
 // Flags ODR Register:
 #define GPIO_0_ODR_HIGH             0x01
@@ -219,7 +221,14 @@
 /*Function definitions---------------------------------------------------------*/
 void initGpioF7AsAnalog( void );
 void initGpioF789AsAnalog( void );
-
+void initGpioB0AsAF2( void );
+void initGpioC8AsAF2( void );
+void initGpioB1AsOutput( void );
+void setGPIOB1( void );
+void clearGPIOB1( void );
+void enableMotor( void );
+void disableMotor( void );
+float map_analog_value(int analog_adc_val);
 
 #ifdef __cplusplus
 }
