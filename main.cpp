@@ -55,7 +55,7 @@ int main (void)
 
         setTimer3PWMDutyCycle(duty_cycle); // Set value between 0 and 1
 
-        delay(10);
+        delay(1);
     }
 }
 #endif
