@@ -16,9 +16,13 @@
 
 // --------------------------
 // Global variables
+
+#define CPR 42
+
+
 typedef struct encoder_state {
     uint16_t pos;
-    uint16_t vel;
+    float vel;
     uint8_t enc_a;
     uint8_t enc_b;
     uint32_t last_read_time;
@@ -73,6 +77,17 @@ void EXTI9_5_IRQHandler( void) {
         // 0 1 -> 1 1 Forward 1 -> 3
         // 1 1 -> 1 0 Forward 3 -> 2
         // 1 0 -> 0 0 Forward 2 -> 0
+
+        uint32_t current_time = get_timer_time();
+        uint32_t dt = 0xFFFF;
+        // Condition on overflow
+        if (current_time < last_time)
+        {
+            dt = (overflow-last_time) + current_time;
+        } else {
+            dt = current_time - last_time;
+        }
+        es.vel = 1 / CPR_TO_RPM / dt;
 
 
         
