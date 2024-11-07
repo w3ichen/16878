@@ -219,6 +219,8 @@
 
 
 /*Function definitions---------------------------------------------------------*/
+uint8_t read_b6(void);
+uint8_t read_c6(void);
 void initGpioF7AsAnalog( void );
 void initGpioF789AsAnalog( void );
 void initGpioB0AsAF2( void );

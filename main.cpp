@@ -5,6 +5,7 @@
 #include "hardware_stm_dma_controller.h"
 #include "hardware_stm_gpio.h"
 #include "hardware_stm_timer3.h"
+#include "hardware_stm_interrupt.h"
 
 
 // --------------------------
@@ -14,6 +15,17 @@
 #define PART2
 
 // --------------------------
+// Global variables
+typedef struct encoder_state {
+    uint16_t pos;
+    uint16_t vel;
+    uint8_t enc_a;
+    uint8_t enc_b;
+    uint32_t last_read_time;
+}
+
+static encoder_state es;
+
 // -- Helper functions ------
 
 void delay(int num){
@@ -21,6 +33,66 @@ void delay(int num){
         // busy wait
     }
 }
+
+void EXTI9_5_IRQHandler( void) {
+    uint32_t * register_value;
+    register_value = (uint32_t *)EXTI_PR;
+    //check which interrupt fired:
+    if ((*register_value & EXTI_PR_6)>0)
+    {
+        //clear the interrupt:
+        *register_value = EXTI_PR_6; //rc_w1
+        // Check the values of the pins
+        uint8_t c6 = read_c6();
+        uint8_t b6 = read_b6();
+        uint8_t current = c6 << 1 | b6;
+        uint8_t old = es.enc_a << 1 | es.enc_b;
+        uint16_t current_pos = es.pos;
+        // Encoder logic
+        switch (old)
+        {
+            case 0:
+                if (current == 1) current_pos += 1;
+                else if (current == 2) current_pos -= 1;
+                break;
+            case 1:
+                if (current == 3) current_pos += 1;
+                else if (current == 0) current_pos  -= 1;
+                break;
+            case 2:
+                if (current == 0) current_pos += 1;
+                else if (current == 3) current_pos -= 1;
+                break;
+            case 3:
+                if (current == 2) current_pos += 1;
+                else if (current == 1) current_pos -= 1;
+                break;
+        }
+        // C = A, B = B
+        // 0 0 -> 0 1 Forward 0 -> 1
+        // 0 1 -> 1 1 Forward 1 -> 3
+        // 1 1 -> 1 0 Forward 3 -> 2
+        // 1 0 -> 0 0 Forward 2 -> 0
+
+
+        
+    }
+}
+
+void EXTI0_IRQHandler(void)
+{
+    register_value = (uint32_t *)EXTI_PR;
+    //check which interrupt fired:
+    if ((*register_value & EXTI_PR_0)>0)
+    {
+        //clear the interrupt:
+        *register_value = EXTI_PR_0; //rc_w1
+        // Check the values of the pins
+        pc.printf("Button press handler");
+        
+    }
+}
+
 // --------------------------
 
 

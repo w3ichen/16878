@@ -6,6 +6,29 @@
 #define MAX_POTENTIOMETER_VAL 3920
 
 /* function definitions----------------------------------------------------------*/
+uint8_t read_c6(void) {
+    uint16_t value;
+    uint32_t *reg_pointer;
+    uint32_t value_mask = PIN6H;
+
+    // get the current value of the pin
+    reg_pointer = (reg)PORTC_ODR_REGISTER;
+    value = *reg_pointer & value_mask;
+    return value > 0;
+}
+
+uint8_t read_b6(void) {
+    uint16_t value;
+    uint32_t *reg_pointer;
+    uint32_t value_mask = PIN6H;
+
+    // get the current value of the pin
+    reg_pointer = (reg)PORTB_ODR_REGISTER;
+    value = *reg_pointer & value_mask;
+    return value > 0;
+}
+
+
 void initGpioF7AsAnalog( void ) {
     uint32_t* reg_pointer;
     // 1. Enable the AHB1 clock for GPIO F clock:
