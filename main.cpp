@@ -6,6 +6,7 @@
 #include "hardware_stm_gpio.h"
 #include "hardware_stm_timer3.h"
 #include "hardware_stm_interrupt.h"
+#include "pid.h"
 
 
 // --------------------------
@@ -13,6 +14,7 @@
 // #define PART1_Q1
 // #define PART1_Q2
 #define PART2
+#define PART3
 
 // --------------------------
 // Global variables
@@ -113,6 +115,20 @@ void EXTI0_IRQHandler(void)
 
 // Serial setup between pc and micrcontroller
 Serial pc(USBTX, USBRX);
+
+#ifdef PART3
+int main(void)
+{
+    
+    while(1)
+    {
+        //Event Checker:
+        timeoutCheck();
+        //Service Handler:
+        eventHandler();
+    }
+
+}
 
 #ifdef PART2
 int main (void)
