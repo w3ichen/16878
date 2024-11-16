@@ -9,10 +9,10 @@
 uint8_t read_c6(void) {
     uint16_t value;
     uint32_t *reg_pointer;
-    uint32_t value_mask = PIN6H;
+    uint32_t value_mask = PIN_6;
 
     // get the current value of the pin
-    reg_pointer = (reg)PORTC_ODR_REGISTER;
+    reg_pointer = (uint32_t*)PORTC_ODR_REGISTER;
     value = *reg_pointer & value_mask;
     return value > 0;
 }
@@ -20,10 +20,22 @@ uint8_t read_c6(void) {
 uint8_t read_b6(void) {
     uint16_t value;
     uint32_t *reg_pointer;
-    uint32_t value_mask = PIN6H;
+    uint32_t value_mask = PIN_6;
 
     // get the current value of the pin
-    reg_pointer = (reg)PORTB_ODR_REGISTER;
+    reg_pointer = (uint32_t*)PORTB_ODR_REGISTER;
+    value = *reg_pointer & value_mask;
+    return value > 0;
+}
+
+uint8_t read_pin(uint32_t BASE_ADDR, uint32_t pin)
+{
+    uint16_t value;
+    uint32_t *reg_pointer;
+    uint32_t value_mask = pin;
+
+    // get the current value of the pin
+    reg_pointer = (uint32_t*) BASE_ADDR;
     value = *reg_pointer & value_mask;
     return value > 0;
 }
@@ -133,4 +145,52 @@ float map_analog_value(int analog_adc_val) {
     }
     // Map the value from [0, 3920] to [0, 1]
     return (float)analog_adc_val / (float)MAX_POTENTIOMETER_VAL;
+}
+
+void initGpioAsOutput(uint32_t BASE_ADDR, uint8_t pin)
+{
+    uint32_t *reg_pointer;
+    /* GPIOB Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    /* GPIOB0 configured as output */
+    reg_pointer = (uint32_t *)(BASE_ADDR + MODER_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (MODER_OUPUT << 2 * pin);
+    /*GPIOB0 configured as push-pull */
+    reg_pointer = (uint32_t *) (BASE_ADDR + OTYPER_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (OTYPER_PP << pin);
+    /*GPIOB0 configured floating */
+    reg_pointer = (uint32_t *) (BASE_ADDR + PUPDR_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (PUPDR_FLOAT << 2 * pin);
+}
+
+void initGpioAsInput(uint32_t BASE_ADDR, uint8_t pin)
+{
+    uint32_t *reg_pointer;
+    /* GPIOB Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    /* GPIOB0 configured as output */
+    reg_pointer = (uint32_t *)(BASE_ADDR + MODER_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (MODER_INPUT << 2 * pin);
+    /*GPIOB0 configured as push-pull */
+    reg_pointer = (uint32_t *) (BASE_ADDR + OTYPER_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (OTYPER_PP << pin);
+    /*GPIOB0 configured floating */
+    reg_pointer = (uint32_t *) (BASE_ADDR + PUPDR_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (PUPDR_FLOAT << 2 * pin);
+}
+
+void initGpioAsAnalog(uint32_t BASE_ADDR, uint8_t pin)
+{
+    uint32_t *reg_pointer;
+    /* GPIOB Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    /* GPIOB0 configured as output */
+    reg_pointer = (uint32_t *)(BASE_ADDR + MODER_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (MODER_ANLG << 2 * pin);
+    /*GPIOB0 configured as push-pull */
+    reg_pointer = (uint32_t *) (BASE_ADDR + OTYPER_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (OTYPER_PP << pin);
+    /*GPIOB0 configured floating */
+    reg_pointer = (uint32_t *) (BASE_ADDR + PUPDR_REG_OFFSET);
+    *reg_pointer = *reg_pointer | (PUPDR_FLOAT << 2 * pin);
 }

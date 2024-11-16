@@ -7,30 +7,19 @@
 #include "hardware_stm_timer3.h"
 #include "hardware_stm_interrupt.h"
 #include "pid.h"
+#include "event_handler.h"
 
 
 // --------------------------
 // Select code to run
 // #define PART1_Q1
 // #define PART1_Q2
-#define PART2
+// #define PART2
 #define PART3
 
 // --------------------------
 // Global variables
 
-#define CPR 42
-
-
-typedef struct encoder_state {
-    uint16_t pos;
-    float vel;
-    uint8_t enc_a;
-    uint8_t enc_b;
-    uint32_t last_read_time;
-}
-
-static encoder_state es;
 
 // -- Helper functions ------
 
@@ -39,6 +28,43 @@ void delay(int num){
         // busy wait
     }
 }
+
+
+
+void EXTI0_IRQHandler(void)
+{
+    uint32_t* register_value = (uint32_t *)EXTI_PR;
+    //check which interrupt fired:
+    if ((*register_value & EXTI_PR_0)>0)
+    {
+        //clear the interrupt:
+        *register_value = EXTI_PR_0; //rc_w1
+        // Check the values of the pins
+        printf("Button press handler");
+        
+    }
+}
+
+// --------------------------
+
+
+// Serial setup between pc and micrcontroller
+// Serial pc(USBTX, USBRX);
+
+#ifdef PART3
+
+#define CPR 42
+
+
+typedef struct  {
+    uint16_t pos;
+    float vel;
+    uint8_t enc_a;
+    uint8_t enc_b;
+    uint32_t last_read_time;
+} encoder_state;
+
+static encoder_state es;
 
 void EXTI9_5_IRQHandler( void) {
     uint32_t * register_value;
@@ -80,43 +106,24 @@ void EXTI9_5_IRQHandler( void) {
         // 1 1 -> 1 0 Forward 3 -> 2
         // 1 0 -> 0 0 Forward 2 -> 0
 
-        uint32_t current_time = get_timer_time();
+        uint32_t current_time = getTimerTime();
         uint32_t dt = 0xFFFF;
         // Condition on overflow
-        if (current_time < last_time)
+        if (current_time < es.last_read_time)
         {
-            dt = (overflow-last_time) + current_time;
+            dt = (OVERFLOW-es.last_read_time) + current_time;
         } else {
-            dt = current_time - last_time;
+            dt = current_time - es.last_read_time;
         }
-        es.vel = 1 / CPR_TO_RPM / dt;
+        es.vel = 1.0 / CPR / dt;
+        es.last_read_time = current_time;
 
 
         
     }
 }
 
-void EXTI0_IRQHandler(void)
-{
-    register_value = (uint32_t *)EXTI_PR;
-    //check which interrupt fired:
-    if ((*register_value & EXTI_PR_0)>0)
-    {
-        //clear the interrupt:
-        *register_value = EXTI_PR_0; //rc_w1
-        // Check the values of the pins
-        pc.printf("Button press handler");
-        
-    }
-}
 
-// --------------------------
-
-
-// Serial setup between pc and micrcontroller
-Serial pc(USBTX, USBRX);
-
-#ifdef PART3
 int main(void)
 {
     
@@ -129,6 +136,7 @@ int main(void)
     }
 
 }
+#endif
 
 #ifdef PART2
 int main (void)
@@ -152,9 +160,9 @@ int main (void)
     while (1) {
         startADCConversion();
         analog_adc_val = returnADC3StoredValue(0);
-        pc.printf("potentiometer = %u;\n", analog_adc_val);
+        printf("potentiometer = %u;\n", analog_adc_val);
         duty_cycle = map_analog_value(analog_adc_val);
-        pc.printf("duty_cycle = %f;\n", duty_cycle);
+        printf("duty_cycle = %f;\n", duty_cycle);
 
         setTimer3PWMDutyCycle(duty_cycle); // Set value between 0 and 1
 

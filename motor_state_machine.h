@@ -8,15 +8,23 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "event_handler.h"
 
 /* Macros for Everyone--------------------------------------------------------*/
 
+/* Types */
+typedef enum {
+    Initialize,
+    Start,
+    CW,
+    CCW
+} motorState_t;
 
 
-
+static motorState_t motorState = Initialize;
 /*Function definitions---------------------------------------------------------*/
 
-void MotorStateMachine (event_t newevent, uint16_t param1, double param2)
+void MotorStateMachine (event_t newevent, uint16_t param1, double param2);
 
 #ifdef __cplusplus
 }

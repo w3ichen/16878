@@ -217,6 +217,39 @@
 #define PORTF_IDR_REGISTER          (PORTF_BASE_ADDRESS + 0x10)
 
 
+// OFFSETS
+
+#define MODER_REG_OFFSET    (uint32_t) 0x00
+#define OTYPER_REG_OFFSET   (uint32_t) 0x04
+#define OSPEEDR_REG_OFFSET  (uint32_t) 0x08
+#define PUPDR_REG_OFFSET    (uint32_t) 0x0c
+#define IDR_REG_OFFSET      (uint32_t) 0x10
+#define ODR_REG_OFFSET      (uint32_t) 0x14
+#define AFR1_REG_OFFSET     (uint32_t) 0x20
+#define AFR2_REG_OFFSET     (uint32_t) 0x24
+
+//flags MODER Register:
+#define MODER_INPUT (uint16_t) 0b00
+#define MODER_OUPUT (uint16_t) 0b01
+#define MODER_AF   (uint16_t) 0b10
+#define MODER_ANLG  (uint16_t) 0b11
+
+
+//flags OTYPER Register:
+#define OTYPER_PP   (uint16_t) 0b00
+#define OTYPER_OD   (uint16_t)  0b01
+
+//flags OSPEEDR Register:
+#define OSPEEDR_LOW     (uint16_t)  0b00
+#define OSPEEDR_MED     (uint16_t)  0b01
+#define OSPEEDR_FAST    (uint16_t)  0b10
+#define OSPEEDR_HIGH    (uint16_t)  0b11
+
+//flags PUPDR Register:
+#define PUPDR_FLOAT (uint16_t)  0b00
+#define PUPDR_UP    (uint16_t)  0b01
+#define PUPDR_DOWN  (uint16_t)  0b10
+#define PUPDR_RSVD  (uint16_t)  0b11
 
 /*Function definitions---------------------------------------------------------*/
 uint8_t read_b6(void);
@@ -226,6 +259,11 @@ void initGpioF789AsAnalog( void );
 void initGpioB0AsAF2( void );
 void initGpioC8AsAF2( void );
 float map_analog_value(int analog_adc_val);
+
+void initGpioAsInput(uint32_t BASE_ADDR, uint8_t pin);
+void initGpioAsAnalog(uint32_t BASE_ADDR, uint8_t pin);
+void initGpioAsOutput(uint32_t BASE_ADDR, uint8_t pin);
+uint8_t read_pin(uint32_t BASE_ADDR, uint32_t pin);
 
 #ifdef __cplusplus
 }

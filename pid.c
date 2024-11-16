@@ -12,10 +12,10 @@ uint16_t pid(uint16_t current, uint16_t setpoint, PID_t pid_state)
     uint16_t output = Kp * (err) + Ki * pid_state.i + Kd * (err - pid_state.prev_err); //calculate the PID output 
     pid_state.prev_err = err; // accumulate the integral error
     pid_state.i = pid_state.i + err; 
-    if {pid_state.i > pid_state.i_max}//If the motor overshot its position
-         pid_state.i = pid_state.i_max; // Update the PID integral error to be the new max error
-    if {pid_state.i < pid_state.i_min} //If the motor undershot its position
-     pid_state.i = pid_state.i_min; //Update the PID integral error to be the new min error 
+
+    // Cliping I to fall between pid_staete i_min and i_max
+    if (pid_state.i < pid_state.i_min) pid_state.i = pid_state.i_min;
+    if (pid_state.i > pid_state.i_max) pid_state.i = pid_state.i_max;
     return output; //return the output of the pid controller 
 }
 

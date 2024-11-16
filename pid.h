@@ -1,13 +1,16 @@
 #pragma once // only include this header file once
 
+#include "main.h"
+
 #define Kp 1 //proportional gain 
 #define Ki 0 //Integral gain (Can be changed, but change in terms of decimals)
 #define Kd 0 //Derivative gain (can be changed, but change in terms of decimals)
 
 /*Is there a reason why these are not inputs into the PID function? Ig simplicity but ?*/
+// Avoids having to change in code in multiple spots, ensures everywhere is using the same params
 
 typedef struct PID_t {
-    uint16_t prev_error; //previous error
+    uint16_t prev_err; //previous error
     uint16_t i; // integral
     uint16_t i_min; //integral minimum
     uint16_t i_max; //integral maximum

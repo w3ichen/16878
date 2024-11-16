@@ -9,8 +9,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#define Max_Queue_Size 10
+
 /*Event List*/
-typdef enum {
+typedef enum {
     Ready, 
     Button_Pressed,
     Edge_Detected,
@@ -18,8 +20,6 @@ typdef enum {
     StartTimer, 
     EndTimer,
     Timeout,
-    CW,
-    CCW
 } event_t;
 
 /*Event Objects */
@@ -39,19 +39,28 @@ typedef struct eventQueue_o
     uint16_t end; //end of queue
 }eventQueue;
 
-/*Timer list  */
-typedef struct timerList{
-    list[Max_Queue_Size];
-    uint16_t size; //Size of queue
-    uint16_t start; //start of queue
-    uint16_t end; //end of queue
+typedef struct  {
+    uint32_t timeouts[Max_Queue_Size];
+    uint16_t size;
+    uint16_t start;
+    uint16_t end;
+} timerList;
 
-}timerList;
-}
+static eventQueue event_q;
+static timerList timer_list;
 
 /*Functions */
 void eventHandler(void);
 void timeoutCheck(void);
 void deleteEvent(void);
-void deleteTimerFromList(void);
+void addEvent(event_o event);
+// void deleteTimerFromList(void);
+void sendEvent(event_t event, uint16_t param1, double param2);
+void insertTimer(uint32_t timeout);
+void deleteTimerFromList(uint8_t indx);
 
+#ifdef __cplusplus
+ }
+#endif
+
+#endif

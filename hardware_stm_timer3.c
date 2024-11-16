@@ -1,6 +1,7 @@
 #include "stm32f4xx_rcc_mort.h"
 #include "hardware_stm_gpio.h"
 #include "hardware_stm_timer3.h"
+#include "hardware_stm_interrupt.h"
 #include <cstdint>
 
 #define TIM3_BASE_ADDRESS               ((uint32_t)0x40000400)
@@ -62,6 +63,10 @@
 #define TIM3_CH1_IN_POLARITY_RISING     0x00
 #define TIM3_CH1_ENABLE                 0x01
 
+#define TIM3_CNT            (TIMER_3_BASE_ADDR + TIM_CNT_OFFSET)
+#define TIM_CNT_OFFSET 0x24
+#define TIMER_3_BASE_ADDR   0x40000400
+
 
 
 // duty_cycle in range 0-1
@@ -108,4 +113,13 @@ void initTimer3AsPWM( void )
     // (10) Enable the timer subsystem by setting the CEN bit in TIM3_CR1
     reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1; // TIM3_CR1
     *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
+}
+
+uint32_t getTimerTime()
+{
+    uint16_t* register_value;
+    uint16_t cnt;
+    register_value = (uint16_t*) TIM4_CNT;
+    cnt = *register_value;
+    return cnt;
 }

@@ -1,20 +1,29 @@
+#include "hardware_stm_timer3.h"
 #include "stm32f4xx_rcc_mort.h"
 #include "event_handler.h"
+#include "button_state_machine.h"
+#include "motor_state_machine.h"
+#include "hardware_stm_interrupt.h"
 
-#define Max_Queue_Size 10 //Define max size of the queue
 
-initeventQueue();
+void sendEvent(event_t event, uint16_t param1, double param2) {
+    event_o new_event;
+    new_event.type = event;
+    new_event.param1 = param1;
+    new_event.param2 = param2;
+    addEvent(new_event);
+}
 
 void eventHandler(void)
 {
     event_o currentEvent; 
 
-    if(eventQueue.size == 0)
+    if(event_q.size == 0)
     {
         currentEvent.type = No_Event;
     }
     else {
-        currentEvent = eventQueue.queue[eventQueue.start];
+        currentEvent = event_q.queue[event_q.start];
         deleteEvent();
         switch (currentEvent.type)
         {
@@ -22,11 +31,11 @@ void eventHandler(void)
                 MotorStateMachine(No_Event, currentEvent.param1, currentEvent.param2);
                 break;
             case StartTimer:
-                insertTimer(currentEvent.param1, currentEvent.param2, get_timer_time());
+                insertTimer(currentEvent.param1);
                 break;
-            case EndTimer:
-                insertTimer(currentEvent.param1, currentEvent.param2, get_timer_time());
-                break;
+            // case EndTimer:
+            //     insertTimer(currentEvent.param1, currentEvent.param2, getTimerTime());
+            //     break;
             case Timeout:
                 MotorStateMachine(Timeout, currentEvent.param1, currentEvent.param2);
                 ButtonStateMachine(Timeout, currentEvent.param1, currentEvent.param2);
@@ -35,124 +44,157 @@ void eventHandler(void)
             case Button_Pressed:
                 ButtonStateMachine(Button_Pressed, currentEvent.param1, currentEvent.param2);
                 break;
-            case CW:
-                MotorStateMachine(CW, currentEvent.param1, currentEvent.param2);
-                break;
-            case CCW:
-                MotorStateMachine(CCW, currentEvent.param1, currentEvent.param2);
+            // case CW:
+            //     MotorStateMachine(CW, currentEvent.param1, currentEvent.param2);
+            //     break;
+            // case CCW:
+            //     MotorStateMachine(CCW, currentEvent.param1, currentEvent.param2);
+            //     break;
+            default:
                 break;
         }
     }
+}
+
+void insertTimer(uint32_t timeout)
+{
+    uint32_t current_time = getTimerTime();
+    uint32_t timeout_time = current_time + timeout;
+    if (timeout_time > OVERFLOW)
+    {
+        timeout_time = timeout_time - OVERFLOW; // Wrap around in case the timeout exceeds the max
+    }
+    timer_list.timeouts[timer_list.end] = timeout_time;
+    timer_list.end++;
+    timer_list.size++;
 }
 
 void timeoutCheck(void)
 {
-    double timeoutTime; 
-    double prevTime, currTime; 
-    uint16_t index, timerNumber;
+    uint32_t current_time = getTimerTime();
 
-    if(timerList.size > 0)
+    for(uint16_t i = 0; i < timer_list.size; i++)
     {
-        if(timerList.size == 1)
+        uint32_t timeout = timer_list.timeouts[i];
+        if (current_time >= timeout)
         {
-            timeoutTime = timerList.list[timerList.start].timeoutTime;
-            prevTime = timerList[timerList.start].prevTime;
-            timerNumber = timerList.list[timerList.start].timerNumber;
-
-            currTime = getTime_timer();
-
-            if(absoluteVal2(currTime-prevTime) > timeoutTime)
-            {
-
-                deleteTimerFromList(0);
-                sendEvent(Timeout, timerNumber, timeoutTime);
-            }
-            else {
-            {
-                index = timerList.start;
-                for (int i = 0; i < timerList.size; i++)
-                {
-                    index = 0;
-                }
-                timeoutTime = timerList.list[index].timeoutTime;
-                prevTime = timerList.list[index].prevTime;
-                timerNumber = timerList[index].timerNumber;
-
-                currTime = getTime_timer();
-
-                if(absoluteVal2(currTime - prevTime) > timeoutTime)
-                {
-                    deleteTimerFromList(i);
-                    sendEvent(Timeout, timerNumber, timeoutTime);
-                    return;
-                }
-                index = index + 1;
-            }
-            }
+            sendEvent(Timeout, i, current_time);
+            deleteTimerFromList(i);
+            return;   // Only fire one timeout at a time
         }
+    }
+
+
+    // if(timer_list.size > 0)
+    // {
+    //     if(timer_list.size == 1)
+    //     {
+    //         timeoutTime = timer_list.list[timer_list.start].timeoutTime;
+    //         prevTime = timer_list[timer_list.start].prevTime;
+    //         timerNumber = timer_list.list[timer_list.start].timerNumber;
+
+    //         currTime = getTime_timer();
+
+    //         if(absoluteVal2(currTime-prevTime) > timeoutTime)
+    //         {
+
+    //             deleteTimerFromList(0);
+    //             sendEvent(Timeout, timerNumber, timeoutTime);
+    //         }
+    //         else {
+    //         {
+    //             index = timer_list.start;
+    //             for (int i = 0; i < timer_list.size; i++)
+    //             {
+    //                 index = 0;
+    //             }
+    //             timeoutTime = timer_list.list[index].timeoutTime;
+    //             prevTime = timer_list.list[index].prevTime;
+    //             timerNumber = timer_list[index].timerNumber;
+
+    //             currTime = getTime_timer();
+
+    //             if(absoluteVal2(currTime - prevTime) > timeoutTime)
+    //             {
+    //                 deleteTimerFromList(i);
+    //                 sendEvent(Timeout, timerNumber, timeoutTime);
+    //                 return;
+    //             }
+    //             index = index + 1;
+    //         }
+    //         }
+    //     }
 }
 
 /*Needs to be changed since exti9 5 irq handler is already in use */
-void EXTI9_5_IRQHandler(void)
-{
-    uint32_t * reg_pointer_32;
-    reg_pointer_32 = (uint32_t *) EXTERNAL_INTERRUPT_CONTROLLER_PENDING_REGISTER;
+// void EXTI9_5_IRQHandler(void)
+// {
+//     uint32_t * reg_pointer_32;
+//     reg_pointer_32 = (uint32_t *) EXTI_PR;
 
-    //check which interrupt fired:
-    if((*reg_pointer_32 & EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6)>0);
-    {
-        //clear the interrupt
-        *reg_pointer_32 = EXTERNAL_INTERRUPT_CONTROLLER_PENDING_EXTI6;
-        sendEvent(Edge_Detected, 6, 0);
-    }
-}
+//     //check which interrupt fired:
+//     if((*reg_pointer_32 & EXTI_PR_6))    {
+//         //clear the interrupt
+//         *reg_pointer_32 = EXTI_PR_6;
+//         sendEvent(Edge_Detected, 6, 0);
+//     }
+// }
 
 void deleteEvent(void)
 {
-    for (int a = 0; a < eventQueue->end -1; a ++)
+    for (int a = 0; a < event_q.end -1; a ++)
     {
-        eventQueue->queue[a] = eventQueue->queue[a + 1];
+        event_q.queue[a] = event_q.queue[a + 1];
     }
 
     //Adjust the end index
-    eventQueue->end = (eventQueue->end) -1;
+    event_q.end = (event_q.end) -1;
     
 }
 
-void deleteTimerFromList(void)
+void addEvent(event_o event)
 {
- for (int b = 0; b < eventQueue->end -1; b ++)   
- {
-     timerList->list[b] = timerList->list[b + 1];
- }
- //Adjust the end index
- timerList->end = (timerList->end) - 1;
+    event_q.queue[event_q.end] = event;
+    event_q.end++;    
 }
 
-void initeventQueue(eventQueue)
+void deleteTimerFromList(uint8_t indx)
 {
-    eventQueue->start = -1;
-    eventQueue->end = -1;
-}
-
-void inittimerList(timerList)
-{
-    timerList->start = -1;
-    timerList->end = -1;
-}
-
-void sendEvent(eventQueue eq, uint8_t value)
-{
-    if( (eq.end + 1) > Max_Queue_Size)
+    int insert_indx = 0;
+    for (int b = 0; b < timer_list.size; b++)   // Minus one due to size change
     {
-        printf("Event Queue full");
+        if (b == indx) continue;
+        timer_list.timeouts[insert_indx] = timer_list.timeouts[insert_indx + 1];
+        insert_indx++;
     }
-    else
-    {
-        if (eq.start == -1){
-            eq.start = 0;
-        }
-        evq.end = eq.end + 1;
-        eq.queue[eq.end] = value;
-    }
+    //Adjust the end index
+    timer_list.end--;
 }
+
+void initevent_q(eventQueue event_q)
+{
+    event_q.start = -1;
+    event_q.end = -1;
+}
+
+void inittimerList(timerList timer_list)
+{
+    timer_list.start = -1;
+    timer_list.end = -1;
+}
+
+// void sendEvent(event_q eq, uint8_t value)
+// {
+//     if( (eq.end + 1) > Max_Queue_Size)
+//     {
+//         printf("Event Queue full");
+//     }
+//     else
+//     {
+//         if (eq.start == -1){
+//             eq.start = 0;
+//         }
+//         evq.end = eq.end + 1;
+//         eq.queue[eq.end] = value;
+//     }
+// }
