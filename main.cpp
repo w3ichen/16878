@@ -117,12 +117,19 @@ void EXTI9_5_IRQHandler( void) {
         }
         es.vel = 1.0 / CPR / dt;
         es.last_read_time = current_time;
-
-
-        
     }
 }
 
+
+void EXTI15_10_IRQHandler(void) {
+    uint32_t * register_value;
+    register_value = (uint32_t *)EXTI_PR;
+    //check which interrupt fired:
+    if ((*register_value & EXTI_PR_13)>0) {
+        *register_value = EXTI_PR_13; //rc_w1
+        
+    }
+}
 
 int main(void)
 {

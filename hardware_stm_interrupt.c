@@ -34,6 +34,35 @@ void enableEXTI_C6(void) {
 
 }
 
+void enableEXTI_C13(void) {
+    uint32_t* register_value;
+    
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+    // Enable EXTI6
+    register_value = (uint32_t*) SYSCFG_EXTICR4;
+    // Clear bits
+    // *register_value = *register_value & EXTI_CLR_6;
+    *register_value = *register_value | EXTI_C << 4;
+
+    // Configure EXTI13
+    
+    // Enable EXTI13 Trigger
+    register_value = (uint32_t*) EXTI_IMR;
+    *register_value = *register_value | 1 << 13;
+
+    // Rising edge trigger
+    register_value = (uint32_t*) EXTI_RTRS;
+    *register_value = *register_value | 1 << 13;
+
+
+
+    // Enable IRQ
+    register_value = (uint32_t*) NVIC_INT_EN_REG_32_63;
+    *register_value = EXTI15_10_INTERRUPT_BIT;
+
+}
+
 void enableEXTI_B6(void) {
     uint32_t* register_value;
     

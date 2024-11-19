@@ -5,8 +5,8 @@
 
 void initButtton(void)
 {
-    initGpioAsInput(PORTC_BASE_ADDRESS, 6);
-    enableEXTI_C6();
+    initGpioAsInput(PORTC_BASE_ADDRESS, 13);
+    enableEXTI_C13();
 }
 
 void ButtonStateMachine(event_t newEvent, uint16_t param1, double param2)

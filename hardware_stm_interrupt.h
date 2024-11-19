@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mbed2/299/TARGET_NUCLEO_F446ZE/TARGET_STM/TARGET_STM32F4/TARGET_NUCLEO_F446ZE/device/stm32f446xx.h"
 #ifdef __cplusplus
     extern "C" {
 #endif
@@ -8,13 +9,14 @@
 #define SYSTEM_CONTROL_BASE_ADDR    (0xE000E000)
 #define SYSTEM_CONTROL_BASE_ADDRESS SYSTEM_CONTROL_BASE_ADDR
 #define NVIC_ADDR_OFFSET            (0x100)
-#define NVID_ADDR                   (SYSTEM_CONTROL_BASE_ADDR + NVIC_ADDR_OFFSET)
-#define NVIC_INT_EN_REG_0_31        (NVID_ADDR)
+#define NVIC_ADDR                   (SYSTEM_CONTROL_BASE_ADDR + NVIC_ADDR_OFFSET)
+#define NVIC_INT_EN_REG_0_31        (NVIC_ADDR)
 #define NVIC_INT_EN_REG_32_63       (NVIC_ADDR+0x4)
 #define NVIC_INT_EN_REG_64_95       (NVIC_ADDR+0x8)
 #define TIM3_INTERRUPT_BIT          (0x20000000)
 #define EXTI9_5_INTERRUPT_BIT       (0x800000)
 #define EXTI0_INTERRUPT_BIT         (0b100000)
+#define EXTI15_10_INTERRUPT_BIT     (0b10000000) //40 - 32 => 8
 
 // Interupt flags
 #define CH3_INT_FLAG                (uint16_t) (0x8)
@@ -51,6 +53,8 @@
 #define EXTI_PR_6                   EXTI_6_EN
 #define EXTI_0_EN                   (uint32_t) (0b1)
 #define EXTI_PR_0                   EXTI_0_EN
+#define EXTI_13_EN                  (uint32_t) (1 << 13)
+#define EXTI_PR_13                  EXTI_13_EN
 
 
 #define EXTI_A                      (uint16_t) 0
@@ -67,7 +71,8 @@ void enableNVIC_Timer3(void);
 void enableEXTI_C6(void);
 void enableEXTI_A0(void);
 void enableEXTI_A6(void);
-void EXTI9_5_IRQHandler( void);
+void EXTI9_5_IRQHandler(void);
+void enableEXTI_C13(void);
 void enableEXTI6OnPortC(void);
 
 #ifdef __cplusplus
